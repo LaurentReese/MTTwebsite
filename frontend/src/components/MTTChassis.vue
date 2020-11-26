@@ -2,21 +2,62 @@
   <div class="MTTChassis">
     <h1>{{ msg1 }}</h1>
     <h1>{{ msg2 }}</h1>
-    <img alt="FENETRES PLIANTES PISCINE" src="../assets/FENETRES PLIANTES PISCINE.jpg" img width="20%">
-    <img alt="FENETRE PISCINE 2" src="../assets/FENETRE PISCINE 2.jpg" img width="20%">
-    <img alt="FENETRES CORSE" src="../assets/FENETRES CORSE.jpg" img width="20%">    
-    <img alt="FENETRES PLIANTES 5VTX" src="../assets/FENETRES PLIANTES 5VTX.jpg" img width="20%">
-    <pre></pre>
-    <img alt="FENETRES PLIANTES 6VTX" src="../assets/FENETRES PLIANTES 6VTX.jpg" img width="20%">        
-    <img alt="PLIANTES 2" src="../assets/PLIANTES 2.jpg" img width="33%">
+    <hr>
+    <img alt="FENETRES PLIANTES PISCINE" src="../assets/FENETRES PLIANTES PISCINE.jpg" img width="40%">
+    &nbsp;&nbsp;    
+    <!--label-->
+      <input type="checkbox" name="chassis1" value="valeur" v-model="chassis1"> Je suis intéressé par ce produit
+    <!--/label-->
+    <!--pre></pre-->
     <hr>    
+    <img alt="FENETRE PISCINE 2" src="../assets/FENETRE PISCINE 2.jpg" img width="40%">
+    &nbsp;&nbsp;    
+    <input type="checkbox" name="chassis2" value="valeur" v-model="chassis2"> Je suis intéressé par ce produit
+    <hr>
+    <img alt="FENETRES CORSE" src="../assets/FENETRES CORSE.jpg" img width="40%">    
+    &nbsp;&nbsp;    
+    <input type="checkbox" name="chassis3" value="valeur" v-model="chassis3"> Je suis intéressé par ce produit
+    <hr>
+    <img alt="FENETRES PLIANTES 5VTX" src="../assets/FENETRES PLIANTES 5VTX.jpg" img width="40%">
+    &nbsp;&nbsp;    
+    <input type="checkbox" name="chassis4" value="valeur" v-model="chassis4"> Je suis intéressé par ce produit
+    <hr>
+    <img alt="FENETRES PLIANTES 6VTX" src="../assets/FENETRES PLIANTES 6VTX.jpg" img width="40%">
+    &nbsp;&nbsp;    
+    <input type="checkbox" name="chassis5" value="valeur" v-model="chassis5"> Je suis intéressé par ce produit    
+    <hr>
+    <img alt="PLIANTES 2" src="../assets/PLIANTES 2.jpg" img width="66%">
+    &nbsp;&nbsp;
+    <input type="checkbox" name="chassis6" value="valeur" v-model="chassis6"> Je suis intéressé par ce produit        
+    <hr>
     <video  ref="videoFenetresAccordeon"
             src="../assets/Fenetres Accordéon Méditerranée Techniques Travaux.webm" 
-            width="800">
+            width="1000">
     </video>
-    <!--hr-->
-    <button :disabled="isPlaying" @click="play">Jouer</button>
-    <button :disabled="!isPlaying" @click="stop">Arrêter</button>      
+    <!--hr    hr prints a line and makes a carriage return, whereas pre does a simple carriage return-->
+    <button class="button btn-primary" v-on:click="playStop"> Jouer / Arrêter </button>    
+    <!--button :disabled="isPlaying" @click="play">Jouer</button>
+    <button :disabled="!isPlaying" @click="stop">Arrêter</button-->
+    &nbsp;&nbsp;
+    <input type="checkbox" name="chassis7" value="valeur" v-model="chassis7"> Je suis intéressé par ce produit
+    <hr>
+    <b>
+    Nom{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}
+    <input v-model="nom"/><pre></pre>
+    Prénom{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}
+    <input v-model="prenom"/><pre></pre>
+    Téléphone{{espace}}{{espace}}
+    <input v-model="telephone"/><pre></pre>
+    E-mail{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}{{espace}}
+    <input v-model="mail"/>    <pre></pre>
+    </b>
+    <h1>
+    {{espace}}{{espace}}{{espace}}{{espace}}{{espace}}
+    {{espace}}{{espace}}{{espace}}{{espace}}{{espace}}    
+    <button class="button btn-primary" v-on:click="envoyer"> INFORMER MTT </button>
+    </h1>
+    <pre></pre>
+    <pre></pre>
 
 
     <!--p>
@@ -49,6 +90,8 @@
 </template>
 
 <script>
+
+// TO DO : factorize, make arrays for texts, checkboxes, spaces, etc
 export default {
   name: 'MTTChassis',
   props: {
@@ -56,7 +99,20 @@ export default {
     msg2 : String
   },
   data : function () {
-    return {isPlaying: false}
+    return {isPlaying: false,
+            chassis1: false, // TO DO : of course array of bool to regroup all my choices
+            chassis2: false, // TO DO : of course array of bool to regroup all my choices
+            chassis3: false, // TO DO : of course array of bool to regroup all my choices
+            chassis4: false, // TO DO : of course array of bool to regroup all my choices            
+            chassis5: false, // TO DO : of course array of bool to regroup all my choices
+            chassis6: false, // TO DO : of course array of bool to regroup all my choices
+            chassis7: false, // TO DO : of course array of bool to regroup all my choices
+            nom : "",
+            prenom : "",
+            telephone : "",
+            mail : "",
+            espace : '\xa0'
+    }
   },
   methods: {
     play() {
@@ -66,7 +122,36 @@ export default {
     stop() {
       this.$refs.videoFenetresAccordeon.pause()
       this.isPlaying = false
-    }
+    },
+    playStop() {
+      if (this.isPlaying)
+        this.$refs.videoFenetresAccordeon.pause()
+      else
+        this.$refs.videoFenetresAccordeon.play()
+      this.isPlaying = !this.isPlaying      
+    },
+    envoyer() {
+      alert("nom=" + this.nom + ",prénom=" + this.prenom + ",téléphone=" + this.telephone + ",mail=" + this.mail)
+      // TO DO handle with the array of course
+      var produits = []
+      if (this.chassis1)
+        produits.push(1)
+      if (this.chassis2)
+        produits.push(2)
+      if (this.chassis3)
+        produits.push(4)
+      if (this.chassis4)
+        produits.push(4)        
+      if (this.chassis5)
+        produits.push(5)
+      if (this.chassis6)
+        produits.push(6)
+      if (this.chassis7)
+        produits.push(7)        
+        
+      alert("intérêt pour les produits : " + produits)
+          
+    }    
   }  
 }
 </script>
