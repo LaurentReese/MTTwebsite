@@ -94,54 +94,27 @@
     <h1>
       {{ espace }}{{ espace }}{{ espace }}{{ espace }}{{ espace }} {{ espace
       }}{{ espace }}{{ espace }}{{ espace }}{{ espace }}
-      <button class="button btn-primary" v-on:click="envoyer">
+      <button class="button btn-primary" v-on:click="postMTTchassis">
         INFORMER MTT
       </button>
     </h1>
     <pre></pre>
     <pre></pre>
-
-    <!--p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul-->
   </div>
 </template>
 
 <script>
 import axios from "axios";
-// TO DO : factorize, make arrays for texts, checkboxes, spaces, etc
+//import Vue from 'vue'
+// import VeeValidate from 'vee-validate'
+/* eslint-disable */
+//Vue.use(VeeValidate)
 export default {
   name: "MTTChassis",
-  props: {
-    msg1: String,
-    msg2: String,
-  },
+
   data: function () {
     return {
-      produits : [8],
+      produits: [8],
       isPlaying: false,
       chassis1: false, // TO DO : of course array of bool to regroup all my choices
       chassis2: false, // TO DO : of course array of bool to regroup all my choices
@@ -157,61 +130,41 @@ export default {
       espace: "\xa0",
     };
   },
+
+  props: {
+    msg1: String,
+    msg2: String,
+  },
+
   methods: {
-    play() {
-      this.$refs.videoFenetresAccordeon.play();
-      this.isPlaying = true;
-    },
-    stop() {
-      this.$refs.videoFenetresAccordeon.pause();
-      this.isPlaying = false;
-    },
     playStop() {
       if (this.isPlaying) this.$refs.videoFenetresAccordeon.pause();
       else this.$refs.videoFenetresAccordeon.play();
       this.isPlaying = !this.isPlaying;
     },
-    envoyer: function () {
-      alert(
-          "nom=" +
-          this.nom +
-          ",prénom=" +
-          this.prenom +
-          ",téléphone=" +
-          this.telephone +
-          ",mail=" +
-          this.mail
-      );
-      // TO DO handle with the array of course
-      this.produits = [false,false,false,false,false,false,false,false];
-      if (this.chassis1) this.produits[1]=true;
-      if (this.chassis2) this.produits[2]=true;
-      if (this.chassis3) this.produits[3]=true;
-      if (this.chassis4) this.produits[4]=true;
-      if (this.chassis5) this.produits[5]=true;
-      if (this.chassis6) this.produits[6]=true;
-      if (this.chassis7) this.produits[7]=true;
-
-      alert("intérêt pour les produits : " + this.produits);
-      this.postMTTchassis();
-    },
     postMTTchassis: function () {
-      var renseignements = { "nom": this.nom, "prenom" : this.prenom, "telephone" : this.telephone, "mail" : this.mail /*, "produits" : this.produits */
+      var dataFromMTT = {
+        nom: this.nom,
+        prenom: this.prenom,
+        telephone: this.telephone,
+        mail: this.mail,
       };
-      // var data = {"num1": parseFloat(this.num1), "num2": parseFloat(this.num2), "num3" : "Le principe de la frappe est l'utilisation de l'énergie cinétique, acquise par une masse en mouvement, et par la brusque interruption de la course de cette masse"}      
-      console.log(renseignements);
-      //axios({ method: "POST", url: "http://127.0.0.1:8090/calc", data: data, headers: {"content-type": "text/plain" } }).then(result => {      
+
+      console.log(dataFromMTT);
+
       axios({
         method: "POST",
         url: "http://127.0.0.1:8090/mttChassis",
-        data: renseignements,
+        data: dataFromMTT,
         headers: { "content-type": "text/plain" },
       })
-        .then((answer) => {
-          console.log(answer.data);
+        .then((result) => {
+          console.log(result.data);
+          alert(result.data["messageServer"])
         })
         .catch((error) => {
           console.error(error);
+          alert("Serveur MTT indisponible")
         });
     },
   },

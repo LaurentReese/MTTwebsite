@@ -6,17 +6,15 @@ import (
 	"net/http"
 )
 
-/*type struct_received struct {
-	Num1 float64 `json:"num1"`
-	Num2 float64 `json:"num2"`
-}*/
-
-type struct_received struct {
-	nom string `json:"nom"`
-	prenom string `json:"prenom"`
-	telephone string `json:"telephone"`
-	mail string `json:"mail"`
+type receivedFromMTTchassis struct {
+	Nom string `json:"nom"`
+	Prenom string `json:"prenom"`
+	Telephone string `json:"telephone"`
+	Mail string `json:"mail"`	
 }
+
+// data coming from my vuejs client
+//var data = {"nom" : this.nom, "prenom" : this.prenom, "telephone" : this.telephone, "mail" : this.mail}
 
 type numsResponseData struct {
 	Add float64 `json:"add"`
@@ -25,41 +23,30 @@ type numsResponseData struct {
 	Div float64 `json:"div"`
 }
 
-func process(numsdata struct_received) (numsResponseData) {
-	
-	var numsres numsResponseData
-	/*numsres.Add = numsdata.Num1 + numsdata.Num2
-	numsres.Mul = numsdata.Num1 * numsdata.Num2
-	numsres.Sub = numsdata.Num1 - numsdata.Num2
-	numsres.Div = numsdata.Num1 / numsdata.Num2*/
-
-	return numsres
+type responseFromGOserver struct {
+	Message string `json:"messageServer"`
 }
 
 func mttChassis(w http.ResponseWriter, request *http.Request) {
 	decoder := json.NewDecoder(request.Body)
 
-	var numsData struct_received
-	var numsResData numsResponseData
+	var mttData receivedFromMTTchassis
+
+	var reponseData responseFromGOserver
+
+	var response = "L'entreprise MTT a été informée, merci de votre intérêt"
 	
-	decoder.Decode(&numsData)
-	fmt.Println(numsData)
-	/*
-	fmt.Println("======================")		
-	fmt.Println("==>",numsData.nom,"<==")	
-	fmt.Println("==>",numsData.prenom,"<==")		
-	fmt.Println("==>",numsData.telephone,"<==")			
-	fmt.Println("==>",numsData.mail,"<==")			
-	fmt.Println("===================")*/
+	decoder.Decode(&mttData)
 
-	//numsResData = process(numsData)
+	fmt.Println(mttData)
 
-	// fmt.Println(numsResData)
+	reponseData.Message = response	
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
     w.WriteHeader(http.StatusOK)
-    if err := json.NewEncoder(w).Encode(numsResData); err != nil {
+
+    if err := json.NewEncoder(w).Encode(reponseData); err != nil {	
         panic(err)
     }
 }
