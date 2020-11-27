@@ -16,13 +16,6 @@ type receivedFromMTTchassis struct {
 // data coming from my vuejs client
 //var data = {"nom" : this.nom, "prenom" : this.prenom, "telephone" : this.telephone, "mail" : this.mail}
 
-type numsResponseData struct {
-	Add float64 `json:"add"`
-	Mul float64 `json:"mul"`
-	Sub float64 `json:"sub"`
-	Div float64 `json:"div"`
-}
-
 type responseFromGOserver struct {
 	Message string `json:"messageServer"`
 }
