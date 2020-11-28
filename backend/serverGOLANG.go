@@ -35,6 +35,7 @@ func mttChassis(w http.ResponseWriter, request *http.Request) {
 	fmt.Println(mttData)
 	sendMail(mttData)
 	// TO DO : + later => fill in a database with the record "mttData"
+	// Sqlite
 
 	reponseData.Message = response	
 
