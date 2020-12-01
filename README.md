@@ -1,2 +1,2 @@
-web site for MTT company (frontend writte with vuejs, backend written with GO)
+web site for MTT company (frontend written with vuejs, backend written with GO)
 # MTTwebsite
