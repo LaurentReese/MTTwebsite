@@ -11,11 +11,24 @@ import (
 	"os"
 )
 
+const MTT_DATABASE string ="MTT-sqlite-database.db"
+
+/* TO DO : improve error handling later on with this kind of treatment
+// To put inside a function
+if err := dec.Decode(&val); err != nil {
+    if serr, ok := err.(*json.SyntaxError); ok {
+        line, col := findLine(f, serr.Offset)
+        return fmt.Errorf("%s:%d:%d: %v", f.Name(), line, col, err)
+    }
+    return err
+}*/
+
 type receivedFromMTTchassis struct {
 	Nom string `json:"nom"`
 	Prenom string `json:"prenom"`
 	Telephone string `json:"telephone"`
-	Mail string `json:"mail"`	
+	Mail string `json:"mail"`
+	Produits [7] bool `json:"produits"`
 }
 
 // data coming from my vuejs client
@@ -37,6 +50,7 @@ func mttChassis(w http.ResponseWriter, request *http.Request) {
 	decoder.Decode(&mttData)
 
 	fmt.Println(mttData)
+	newClientInDatabase(&mttData) // this struct may become bigger, so better to pass it by address
 
 	reponseData.Message = response	
 
@@ -49,88 +63,104 @@ func mttChassis(w http.ResponseWriter, request *http.Request) {
     }
 }
 
-func fillDatabase() {
-	os.Remove("sqlite-database.db") // I delete the file to avoid duplicated records. 
-                                    // SQLite is a file based database.
-
-	log.Println("Creating sqlite-database.db...")
-	file, err := os.Create("sqlite-database.db") // Create SQLite file
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	file.Close()
-	log.Println("sqlite-database.db created")
-
-	sqliteDatabase, _ := sql.Open("sqlite", "./sqlite-database.db") // Open the created SQLite File
-	defer sqliteDatabase.Close() // Defer Closing the database
-	createTable(sqliteDatabase) // Create Database Tables
-
-        // INSERT RECORDS
-	insertStudent(sqliteDatabase, "0001", "Liana Kim", "Bachelor")
-	insertStudent(sqliteDatabase, "0002", "Glen Rangel", "Bachelor")
-	insertStudent(sqliteDatabase, "0003", "Martin Martins", "Master")
-	insertStudent(sqliteDatabase, "0004", "Alayna Armitage", "PHD")
-	insertStudent(sqliteDatabase, "0005", "Marni Benson", "Bachelor")
-	insertStudent(sqliteDatabase, "0006", "Derrick Griffiths", "Master")
-	insertStudent(sqliteDatabase, "0007", "Leigh Daly", "Bachelor")
-	insertStudent(sqliteDatabase, "0008", "Marni Benson", "PHD")
-	insertStudent(sqliteDatabase, "0009", "Klay Correa", "Bachelor")
-
-        // DISPLAY INSERTED RECORDS
-	displayStudents(sqliteDatabase)
+func nodeExists(node string) bool { // to me a node is a folder or a filepath
+	_ , err := os.Stat(node)
+	if err != nil { return false }
+	if os.IsNotExist(err) {return false}
+	return true;
 }
 
-func createTable(db *sql.DB) {
-	createStudentTableSQL := `CREATE TABLE student (
-		"idStudent" integer NOT NULL PRIMARY KEY AUTOINCREMENT,		
-		"code" TEXT,
-		"name" TEXT,
-		"program" TEXT		
-	  );` // SQL Statement for Create Table
-
-	log.Println("Create student table...")
-	statement, err := db.Prepare(createStudentTableSQL) // Prepare SQL Statement
-	if err != nil {
-		log.Fatal(err.Error())
+func newClientInDatabase(newClient *receivedFromMTTchassis) {
+	// os.Remove(MTT_DATABASE)	// Test purpose
+	if (!nodeExists(MTT_DATABASE)) {
+		log.Println("Création de la base de données", MTT_DATABASE)
+		file, err := os.Create(MTT_DATABASE)
+		if err != nil {	log.Panic(err) }
+		file.Close()
+		log.Println("Base de données", MTT_DATABASE, "créée")
 	}
-	statement.Exec() // Execute SQL Statements
-	log.Println("student table created")
+	sqliteDatabase, err := sql.Open("sqlite", MTT_DATABASE) // Open my SQL base
+	if err != nil {	log.Panic(err) }
+	defer sqliteDatabase.Close()		
+
+	createClientTable(sqliteDatabase)
+	insertClient(sqliteDatabase, newClient) // newClient.Nom, newClient.Prenom, newClient.Telephone, newClient.Mail)
 }
 
-// We are passing db reference connection from main to our method with other parameters
-func insertStudent(db *sql.DB, code string, name string, program string) {
-	log.Println("Inserting student record ...")
-	insertStudentSQL := `INSERT INTO student(code, name, program) VALUES (?, ?, ?)`
-	statement, err := db.Prepare(insertStudentSQL) // Prepare statement. 
-                                                   // This is good to avoid SQL injections
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-	_, err = statement.Exec(code, name, program)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-}
+func createClientTable(db *sql.DB) {
+	/*	syntax for a primary key on 2 fields is the following :
+	CREATE TABLE something (
+			column1, 
+			column2, 
+			column3, 
+			PRIMARY KEY (column1, column2)
+		  );
+	for one field with autoincrement, it is like : "integer_field" integer NOT NULL PRIMARY KEY AUTOINCREMENT ==> for a primary key based on a single field
+		   */
 
-func displayStudents(db *sql.DB) {
-	row, err := db.Query("SELECT * FROM student ORDER BY name")
-	if err != nil {
-		log.Fatal(err)
+	var createClientTableSQL string = `CREATE TABLE IF NOT EXISTS clients (
+		"nom" TEXT,
+		"prenom" TEXT,
+		"telephone" TEXT,
+		"mail" TEXT,
+		PRIMARY KEY ("nom","mail")			
+		);` // SQL Statement for Creating a clients table (if not existing)
+
+	log.Println("Création ou ouverture d'une table des clients...")
+	statement, err := db.Prepare(createClientTableSQL) // Prepare my SQL Statement
+	if err != nil {	log.Panic(err) }
+	defer statement.Close()				
+	statement.Exec() // Execute my SQL Statement
+	log.Println("Table des clients créée ou ouverte...")
 	}
+
+func insertClient(db *sql.DB, newClient *receivedFromMTTchassis) { // nom string, prenom string, telephone string, mail string) {
+	var count int
+	log.Println("Ajout d'un nouveau client...")
+
+	var testClientSQL string = `SELECT COUNT(*) FROM clients WHERE nom = ? AND mail = ?`
+	// 1) Test if record with this primary key is already present in the database
+	statement, err := db.Prepare(testClientSQL) // Prepare statement.
+												// should avoid SQL injections
+	if err != nil {	log.Panic(err) }
+	defer statement.Close()															
+	err = statement.QueryRow(newClient.Nom, newClient.Mail).Scan(&count)
+	if err != nil {	log.Panic(err) }
+
+	if count == 1 { // It is already in the database, so just leave
+		log.Println("Client déjà existant...")			
+		return // TO DO: maybe an update of the record with new products that the client is interested in + first name and phone number
+	}
+
+	// 2) Insert the record if not already present in the database
+	var insertClientSQL string = `INSERT INTO clients(nom, prenom, telephone, mail) VALUES (?, ?, ?, ?)`
+						// WHERE NOT EXISTS (SELECT * FROM clients WHERE nom = "REESE" AND mail = "laurent.reese@free.fr" );` // important : PRIMARY KEY = ("nom","mail")
+
+	statement, err = db.Prepare(insertClientSQL) // Prepare statement.
+													// should avoid SQL injections
+	if err != nil { log.Panic(err) }
+	_, err = statement.Exec(newClient.Nom, newClient.Prenom, newClient.Telephone, newClient.Mail) //, newClient.Nom, newClient.Mail) // (*newClient).Nom, (*newClient).Prenom, (*newClient).Telephone, (*newClient).Mail, (*newClient).Nom, (*newClient).Mail)
+	if err != nil { log.Panic(err) }
+	log.Println("Nouveau client ajouté...")
+}
+	
+// TO DO : to get the clients (from the vuejs side), improve the following function
+func displayClients(db *sql.DB) {
+	row, err := db.Query("SELECT * FROM clients ORDER BY nom")
+	if err != nil {	log.Panic(err) }
 	defer row.Close()
 	for row.Next() { // Iterate and fetch the records from result cursor
-		var id int
-		var code string
-		var name string
-		var program string
-		row.Scan(&id, &code, &name, &program)
-		log.Println("Student: ", code, " ", name, " ", program)
+		var nom string
+		var prenom string
+		var telephone string
+		var mail string			
+		row.Scan(&nom, &prenom, &telephone, &mail)
+		log.Println("Client:", nom, prenom, telephone, mail)
 	}
 }
 
+
 func main() {
-	fillDatabase()
-	return	
 	http.HandleFunc("/", mttChassis)
 	http.ListenAndServe(":8090", nil)
 }
