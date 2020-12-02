@@ -12,6 +12,8 @@ import (
 )
 
 const MTT_DATABASE string ="MTT-sqlite-database.db"
+const MTT_ACKNOWLEDGE string = "L'entreprise MTT a été informée, merci de votre intérêt"
+	
 
 /* TO DO : improve error handling later on with this kind of treatment
 // To put inside a function
@@ -39,29 +41,27 @@ type responseFromGOserver struct {
 }
 
 func mttChassis(w http.ResponseWriter, request *http.Request) {
-	decoder := json.NewDecoder(request.Body)
-
+	decoder := json.NewDecoder(request.Body) // create json decoder ...
 	var mttData receivedFromMTTchassis
-
 	var reponseData responseFromGOserver
-
-	var response = "L'entreprise MTT a été informée, merci de votre intérêt"
 	
-	decoder.Decode(&mttData)
+	decoder.Decode(&mttData) // ... and receive data from the vuejs client
 
 	fmt.Println(mttData)
 	newClientInDatabase(&mttData) // this struct may become bigger, so better to pass it by address
 
-	reponseData.Message = response	
+	reponseData.Message = MTT_ACKNOWLEDGE
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
     w.WriteHeader(http.StatusOK)
 
-    if err := json.NewEncoder(w).Encode(reponseData); err != nil {	
-        panic(err)
-    }
+    if err := json.NewEncoder(w).Encode(reponseData); err != nil { panic(err) }
 }
+
+// +----------------------------------------------+
+// | DATABASE BEGIN DATABASE BEGIN DATABASE BEGIN |
+// +----------------------------------------------+
 
 func nodeExists(node string) bool { // to me a node is a folder or a filepath
 	_ , err := os.Stat(node)
@@ -73,7 +73,7 @@ func nodeExists(node string) bool { // to me a node is a folder or a filepath
 func newClientInDatabase(newClient *receivedFromMTTchassis) {
 	// os.Remove(MTT_DATABASE)	// Test purpose
 	if (!nodeExists(MTT_DATABASE)) {
-		log.Println("Création de la base de données", MTT_DATABASE)
+		log.Println("Création de la base de données...", MTT_DATABASE)
 		file, err := os.Create(MTT_DATABASE)
 		if err != nil {	log.Panic(err) }
 		file.Close()
@@ -81,10 +81,11 @@ func newClientInDatabase(newClient *receivedFromMTTchassis) {
 	}
 	sqliteDatabase, err := sql.Open("sqlite", MTT_DATABASE) // Open my SQL base
 	if err != nil {	log.Panic(err) }
-	defer sqliteDatabase.Close()		
+	defer sqliteDatabase.Close()
+	log.Println("Base de données", MTT_DATABASE, "ouverte")	
 
-	createClientTable(sqliteDatabase)
-	insertClient(sqliteDatabase, newClient) // newClient.Nom, newClient.Prenom, newClient.Telephone, newClient.Mail)
+	createClientTable(sqliteDatabase) // will create table if it does not exist
+	insertClient(sqliteDatabase, newClient) // will add or update client
 }
 
 func createClientTable(db *sql.DB) {
@@ -97,7 +98,6 @@ func createClientTable(db *sql.DB) {
 		  );
 	for one field with autoincrement, it is like : "integer_field" integer NOT NULL PRIMARY KEY AUTOINCREMENT ==> for a primary key based on a single field
 		   */
-
 	var createClientTableSQL string = `CREATE TABLE IF NOT EXISTS clients (
 		"nom" TEXT,
 		"prenom" TEXT,
@@ -127,18 +127,28 @@ func insertClient(db *sql.DB, newClient *receivedFromMTTchassis) { // nom string
 	err = statement.QueryRow(newClient.Nom, newClient.Mail).Scan(&count)
 	if err != nil {	log.Panic(err) }
 
-	if count == 1 { // It is already in the database, so just leave
-		log.Println("Client déjà existant...")			
-		return // TO DO: maybe an update of the record with new products that the client is interested in + first name and phone number
+	if count == 1 { // It is already in the database, so just update
+		// 2) Update the existing record
+		log.Println("Client déjà existant...")
+		log.Println("Mise à jour du client existant...")		
+		var insertClientSQL string = `UPDATE clients SET prenom = ?, telephone = ? WHERE nom = ? AND mail = ?` // important : PRIMARY KEY = ("nom","mail")
+		statement, err = db.Prepare(insertClientSQL) // Prepare statement.
+		// should avoid SQL injections
+		if err != nil { log.Panic(err) }
+		_, err = statement.Exec(newClient.Prenom, newClient.Telephone, newClient.Nom, newClient.Mail) // proper code should be (*newClient).Prenom, (*newClient).Telephone ...
+		if err != nil { log.Panic(err) }
+		log.Println("Client existant mis à jour...")
+		return // DONE: update of the client record
+		// TO DO : update with new products that the client is interested in
 	}
 
-	// 2) Insert the record if not already present in the database
+	// 3) Insert the record if not already present in the database
 	var insertClientSQL string = `INSERT INTO clients(nom, prenom, telephone, mail) VALUES (?, ?, ?, ?)`
-						// WHERE NOT EXISTS (SELECT * FROM clients WHERE nom = "REESE" AND mail = "laurent.reese@free.fr" );` // important : PRIMARY KEY = ("nom","mail")
-
+	// N.B. It would have liked to perform a WHERE NOT EXISTS (SELECT * FROM clients WHERE nom = ? AND mail = ? )
+	// But (after many trials) it seems it does not work with sqlite (and/or GOLANG ?). Never mind, to make it work I've done the steps 1) and 2) just above
 	statement, err = db.Prepare(insertClientSQL) // Prepare statement.
 													// should avoid SQL injections
-	if err != nil { log.Panic(err) }
+	if err != nil { panic(err) }
 	_, err = statement.Exec(newClient.Nom, newClient.Prenom, newClient.Telephone, newClient.Mail) //, newClient.Nom, newClient.Mail) // (*newClient).Nom, (*newClient).Prenom, (*newClient).Telephone, (*newClient).Mail, (*newClient).Nom, (*newClient).Mail)
 	if err != nil { log.Panic(err) }
 	log.Println("Nouveau client ajouté...")
@@ -159,6 +169,9 @@ func displayClients(db *sql.DB) {
 	}
 }
 
+// +----------------------------------------+
+// | DATABASE END DATABASE END DATABASE END |
+// +----------------------------------------+
 
 func main() {
 	http.HandleFunc("/", mttChassis)
