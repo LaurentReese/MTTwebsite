@@ -9,11 +9,13 @@ import (
 //	"github.com/mattn/go-sqlite3" // Import go-sqlite3 library	
 	_ "modernc.org/sqlite"
 	"log"
-	"os"	
+	"os"
+	"strconv"
 )
 
 const MTT_DATABASE string ="MTT-sqlite-database.db"
 const MTT_ACKNOWLEDGE string = "L'entreprise MTT a été informée, merci de votre intérêt"
+const MTT_MAX_PRODUCTS int = 7
 	
 
 /* TO DO : improve error handling later on with this kind of treatment
@@ -31,7 +33,7 @@ type receivedFromMTTchassis struct {
 	Prenom string `json:"prenom"`
 	Telephone string `json:"telephone"`
 	Mail string `json:"mail"`
-	Produits [7] bool `json:"produits"`
+	Produits [MTT_MAX_PRODUCTS] bool `json:"produits"` // TO DO : a slice instead of an array ?
 }
 
 // data coming from my vuejs client
@@ -48,10 +50,10 @@ func mttChassis(w http.ResponseWriter, request *http.Request) {
 	
 	decoder.Decode(&mttData) // ... and receive data from the vuejs client
 
-	fmt.Println(mttData)
+	//fmt.Println(mttData)  KEEP it for debugging purpose
 
-	sendMail(mttData)
-	newClientInDatabase(&mttData) // this struct may become bigger, so better to pass it by address
+	sendMail(&mttData) // this struct may become bigger, so better to pass it by address
+	newClientInDatabase(&mttData)
 
 	reponseData.Message = MTT_ACKNOWLEDGE
 
@@ -166,9 +168,10 @@ func displayClients(db *sql.DB) {
 		var nom string
 		var prenom string
 		var telephone string
-		var mail string			
-		row.Scan(&nom, &prenom, &telephone, &mail)
-		log.Println("Client:", nom, prenom, telephone, mail)
+		var mail string	
+		var produits [MTT_MAX_PRODUCTS] int
+		row.Scan(&nom, &prenom, &telephone, &mail, &produits)
+		log.Println("Client:", nom, prenom, telephone, mail, produits)
 	}
 }
 
@@ -176,47 +179,51 @@ func displayClients(db *sql.DB) {
 // | DATABASE END DATABASE END DATABASE END |
 // +----------------------------------------+
 
-func sendMail(info receivedFromMTTchassis) {
- // Sender data.
- from := "rene.lasurete@gmail.com" // old useless acount that I don't care about
- password := "d<5@M48c6UyDz]" // password is here in clear but I don't care as it's an old useless acount
+func sendMail(info *receivedFromMTTchassis) {
+	// Sender data.
+	from := "rene.lasurete@gmail.com" // old useless acount that I don't care about
+	password := "d<5@M48c6UyDz]" // password is here in clear but I don't care as it's an old useless acount
 
- // Receiver email address.
- to := []string{
-   "rene.lasurete@gmail.com",
- }
+	// Receiver email address.
+	to := []string{
+	"rene.lasurete@gmail.com",
+	}
 
- // mail from myself to myself, just to create an entry to store a customer action ;-)
+	// mail from myself to myself, just to create an entry to store a customer action ;-)
 
- // smtp server configuration.
- smtpHost := "smtp.gmail.com"
- smtpPort := "587"
+	// smtp server configuration.
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587"
 
- // Message.
- //message := []byte("Test d'un message sur le MTT serveur.")
- // TO DO ? : add date and time inside the message, although it is normally already in the mail itself
- message := []byte ("Message reçu de la part de " + info.Prenom + " " + info.Nom + "\r\n" +
-                    "mail:" + info.Mail + "\r\n" +
-                    "téléphone:" + info.Telephone + "\r\n" +
-                    "==> intéressé par les chassis")
- 
- // Authentication.
- auth := smtp.PlainAuth("", from, password, smtpHost)
- 
- // Sending email.
- err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, message)
- if err != nil {
-   fmt.Println(err)
-   return
- }
- fmt.Println("Email généré")
+	// TO DO ? : add date and time inside the message, although it is normally already in the mail itself
+	messageString := "Message reçu de la part de " + info.Prenom + " " + info.Nom + "\r\n" +
+					"mail:" + info.Mail + "\r\n" +
+					"téléphone:" + info.Telephone + "\r\n" +
+					"==> intéressé(e) par les produits :" + "\r\n"
+	for i:=0;i<MTT_MAX_PRODUCTS;i++ {
+		if (info.Produits[i]) {		
+			messageString += strconv.Itoa(i+1) // + 1 because product number doesn't start at 0
+			messageString += "\r\n"
+		}
+	}
+
+	fmt.Println(messageString)
+	message := [] byte (messageString)	// fmt.Println(message) would give only numbers
+
+	// Authentication.
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+
+	// Sending email.
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, message)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Email généré")
 }
 
 
 func main() {
-//	var test receivedFromMTTchassis
-//	sendMail(test)
-//	return
 	http.HandleFunc("/", mttChassis)
 	http.ListenAndServe(":8090", nil)
 }

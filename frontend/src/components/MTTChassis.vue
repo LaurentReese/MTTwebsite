@@ -114,7 +114,7 @@ export default {
 
   data: function () {
     return {
-      produits: [8],
+      produits: Boolean [7],
       isPlaying: false,
       chassis1: false, // TO DO : of course array of bool to regroup all my choices
       chassis2: false, // TO DO : of course array of bool to regroup all my choices
@@ -143,11 +143,15 @@ export default {
       this.isPlaying = !this.isPlaying;
     },
     postMTTchassis: function () {
+      // TO DO : take time to find the way to handle directly the array items from/to the view
+      this.produits = [this.chassis1, this.chassis2, this.chassis3, this.chassis4, this.chassis5, this.chassis6, this.chassis7]
+
       var dataFromMTT = {
         nom: this.nom,
         prenom: this.prenom,
         telephone: this.telephone,
         mail: this.mail,
+        produits : this.produits
       };
 
       console.log(dataFromMTT);
