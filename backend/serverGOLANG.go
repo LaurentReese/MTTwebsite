@@ -148,6 +148,11 @@ func insertClient(db *sql.DB, newClient *receivedFromMTTchassis) { // nom string
 	}
 
 	// 3) Insert the record if not already present in the database
+	// Here I'll add a UUID after the mail field, to uniquely identify the potential customer in the table <Interesting_Products>
+	// And something like Corresp[i] will give an absolute product number corresponding to the local product number being i.
+	// FOR THE MOMENT I assume that this relative product number is an absolute product number
+	// The Corresp array will be filled in either using a json file or a database table
+
 	var insertClientSQL string = `INSERT INTO clients(nom, prenom, telephone, mail) VALUES (?, ?, ?, ?)`
 	// N.B. It would have liked to perform a WHERE NOT EXISTS (SELECT * FROM clients WHERE nom = ? AND mail = ? )
 	// But (after many trials) it seems it does not work with sqlite (and/or GOLANG ?). Never mind, to make it work I've done the steps 1) and 2) just above
@@ -181,8 +186,8 @@ func displayClients(db *sql.DB) {
 
 func sendMail(info *receivedFromMTTchassis) {
 	// Sender data.
-	from := "rene.lasurete@gmail.com" // old useless acount that I don't care about
-	password := "d<5@M48c6UyDz]" // password is here in clear but I don't care as it's an old useless acount
+	from := "rene.lasurete@gmail.com" // old useless account that I don't care about
+	password := "d<5@M48c6UyDz]" // password is here in clear but I don't care as it's an old useless account
 
 	// Receiver email address.
 	to := []string{
@@ -202,6 +207,10 @@ func sendMail(info *receivedFromMTTchassis) {
 					"==> intéressé(e) par les produits :" + "\r\n"
 	for i:=0;i<MTT_MAX_PRODUCTS;i++ {
 		if (info.Produits[i]) {		
+			// Hummm, here, later there will be a correspondance table or array to point from relative product number to absolute product number.
+			// Typically, something like Corresp[i] will give a number which will be the absolute product number corresponding to the local product number being i.
+			// FOR THE MOMENT I assume that this relative product number is an absolute product number
+			// The Corresp array will be filled in either using a json file or a database table
 			messageString += strconv.Itoa(i+1) // + 1 because product number doesn't start at 0
 			messageString += "\r\n"
 		}
