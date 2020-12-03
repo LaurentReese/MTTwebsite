@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"github.com/twinj/uuid"
 )
 
 const MTT_DATABASE string ="MTT-sqlite-database.db"
@@ -108,6 +109,7 @@ func createClientTable(db *sql.DB) {
 		"prenom" TEXT,
 		"telephone" TEXT,
 		"mail" TEXT,
+		"uuid" TEXT,
 		PRIMARY KEY ("nom","mail")			
 		);` // SQL Statement for Creating a clients table (if not existing)
 
@@ -143,25 +145,25 @@ func insertClient(db *sql.DB, newClient *receivedFromMTTchassis) { // nom string
 		_, err = statement.Exec(newClient.Prenom, newClient.Telephone, newClient.Nom, newClient.Mail) // proper code should be (*newClient).Prenom, (*newClient).Telephone ...
 		if err != nil { log.Panic(err) }
 		log.Println("Client existant mis à jour...")
-		return // DONE: update of the client record
-		// TO DO : update with new products that the client is interested in
+		// DONE: update of the client record
+	} else {
+		// 3) Insert the record if not already present in the database
+		// Here I'll add a UUID after the mail field, to uniquely identify the potential customer in the table <Interesting_Products>
+		// And something like Corresp[i] will give an absolute product number corresponding to the local product number being i.
+		// FOR THE MOMENT I assume that this relative product number is an absolute product number
+		// The Corresp array will be filled in either using a json file or a database table
+
+		var insertClientSQL string = `INSERT INTO clients(nom, prenom, telephone, mail, uuid) VALUES (?, ?, ?, ?, ?)`
+		// N.B. It would have liked to perform a WHERE NOT EXISTS (SELECT * FROM clients WHERE nom = ? AND mail = ? )
+		// But (after many trials) it seems it does not work with sqlite (and/or GOLANG ?). Never mind, to make it work I've done the steps 1) and 2) just above
+		statement, err = db.Prepare(insertClientSQL) // Prepare statement.
+														// should avoid SQL injections
+		if err != nil { panic(err) }
+		_, err = statement.Exec(newClient.Nom, newClient.Prenom, newClient.Telephone, newClient.Mail, uuid.NewV4().String()) //, newClient.Nom, newClient.Mail) // (*newClient).Nom, (*newClient).Prenom, (*newClient).Telephone, (*newClient).Mail, (*newClient).Nom, (*newClient).Mail)
+		if err != nil { log.Panic(err) }
+		log.Println("Nouveau client ajouté...")
 	}
-
-	// 3) Insert the record if not already present in the database
-	// Here I'll add a UUID after the mail field, to uniquely identify the potential customer in the table <Interesting_Products>
-	// And something like Corresp[i] will give an absolute product number corresponding to the local product number being i.
-	// FOR THE MOMENT I assume that this relative product number is an absolute product number
-	// The Corresp array will be filled in either using a json file or a database table
-
-	var insertClientSQL string = `INSERT INTO clients(nom, prenom, telephone, mail) VALUES (?, ?, ?, ?)`
-	// N.B. It would have liked to perform a WHERE NOT EXISTS (SELECT * FROM clients WHERE nom = ? AND mail = ? )
-	// But (after many trials) it seems it does not work with sqlite (and/or GOLANG ?). Never mind, to make it work I've done the steps 1) and 2) just above
-	statement, err = db.Prepare(insertClientSQL) // Prepare statement.
-													// should avoid SQL injections
-	if err != nil { panic(err) }
-	_, err = statement.Exec(newClient.Nom, newClient.Prenom, newClient.Telephone, newClient.Mail) //, newClient.Nom, newClient.Mail) // (*newClient).Nom, (*newClient).Prenom, (*newClient).Telephone, (*newClient).Mail, (*newClient).Nom, (*newClient).Mail)
-	if err != nil { log.Panic(err) }
-	log.Println("Nouveau client ajouté...")
+	// TO DO : update with new products that the client is interested in	
 }
 	
 // TO DO : to get the clients (from the vuejs side), improve the following function
@@ -233,6 +235,9 @@ func sendMail(info *receivedFromMTTchassis) {
 
 
 func main() {
+//	u := uuid.NewV4()	
+//	fmt.Println(u.String() + "sdfsdf" + "slksdlf")
+//	return
 	http.HandleFunc("/", mttChassis)
 	http.ListenAndServe(":8090", nil)
 }
