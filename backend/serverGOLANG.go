@@ -16,9 +16,9 @@ import (
 
 const MTT_DATABASE string ="MTT-sqlite-database.db"
 const MTT_ACKNOWLEDGE string = "L'entreprise MTT a été informée, merci de votre intérêt"
-const MTT_MAX_PRODUCTS int = 7
+// const MTT_MAX_PRODUCTS int = 7    I use a slice so no need to handle the size !
+const MTT_NO_ROWS_IN_RESULT_SET string = "sql: no rows in result set"
 	
-
 /* TO DO : improve error handling later on with this kind of treatment
 // To put inside a function
 if err := dec.Decode(&val); err != nil {
@@ -34,7 +34,7 @@ type receivedFromMTTchassis struct {
 	Prenom string `json:"prenom"`
 	Telephone string `json:"telephone"`
 	Mail string `json:"mail"`
-	Produits [MTT_MAX_PRODUCTS] bool `json:"produits"` // TO DO : a slice instead of an array ?
+	Produits [] bool `json:"produits"`
 }
 
 // data coming from my vuejs client
@@ -118,23 +118,34 @@ func createClientTable(db *sql.DB) {
 	if err != nil {	log.Panic(err) }
 	defer statement.Close()				
 	statement.Exec() // Execute my SQL Statement
+	if err != nil { log.Panic(err) }	
 	log.Println("Table des clients créée ou ouverte...")
-	}
+}
 
-func insertClient(db *sql.DB, newClient *receivedFromMTTchassis) { // nom string, prenom string, telephone string, mail string) {
-	var count int
+func insertClient(db *sql.DB, newClient *receivedFromMTTchassis) {
+	var unique_id string = ""
+	var existingRecord bool = false
 	log.Println("Ajout d'un nouveau client...")
 
-	var testClientSQL string = `SELECT COUNT(*) FROM clients WHERE nom = ? AND mail = ?`
-	// 1) Test if record with this primary key is already present in the database
+	var testClientSQL string = `SELECT uuid FROM clients WHERE nom = ? AND mail = ?`
+	// 1) Test if a record with this primary key is already present in the database
 	statement, err := db.Prepare(testClientSQL) // Prepare statement.
 												// should avoid SQL injections
 	if err != nil {	log.Panic(err) }
 	defer statement.Close()															
-	err = statement.QueryRow(newClient.Nom, newClient.Mail).Scan(&count)
-	if err != nil {	log.Panic(err) }
+	err = statement.QueryRow(newClient.Nom, newClient.Mail).Scan(&unique_id)
+	// TO DO : I'm not very happy with the test below : it relies on an error string which may change if the database driver changes : ==> improve that
+	if err!=nil && err.Error() == MTT_NO_ROWS_IN_RESULT_SET {
+		// There is no record for this client : so it is a new client, then we create its UUID
+		unique_id = uuid.NewV4().String()
+		err = nil
+		existingRecord = false
+	}  else { 
+		// there is already a record for this client, and its UUID is unique_id
+		existingRecord = true
+	}
 
-	if count == 1 { // It is already in the database, so just update
+	if existingRecord { // It is already in the database, so just update
 		// 2) Update the existing record
 		log.Println("Client déjà existant...")
 		log.Println("Mise à jour du client existant...")		
@@ -159,13 +170,61 @@ func insertClient(db *sql.DB, newClient *receivedFromMTTchassis) { // nom string
 		statement, err = db.Prepare(insertClientSQL) // Prepare statement.
 														// should avoid SQL injections
 		if err != nil { panic(err) }
-		_, err = statement.Exec(newClient.Nom, newClient.Prenom, newClient.Telephone, newClient.Mail, uuid.NewV4().String()) //, newClient.Nom, newClient.Mail) // (*newClient).Nom, (*newClient).Prenom, (*newClient).Telephone, (*newClient).Mail, (*newClient).Nom, (*newClient).Mail)
+		_, err = statement.Exec(newClient.Nom, newClient.Prenom, newClient.Telephone, newClient.Mail, unique_id) //, newClient.Nom, newClient.Mail) // (*newClient).Nom, (*newClient).Prenom, (*newClient).Telephone, (*newClient).Mail, (*newClient).Nom, (*newClient).Mail)
 		if err != nil { log.Panic(err) }
 		log.Println("Nouveau client ajouté...")
 	}
-	// TO DO : update with new products that the client is interested in	
+	createOrUpdateInterestingProducts(db, unique_id, newClient.Produits) // update with new products that the client is interested in
 }
-	
+
+func createOrUpdateInterestingProducts(db *sql.DB, unique_id string, products [] bool) {
+	createInterestingProductsTable(db)
+	UpdateInterestingProducts(db, unique_id, products)
+	log.Println("-->", unique_id, "<--")	
+	log.Println("-->", products , "<--")
+}
+
+func createInterestingProductsTable(db *sql.DB) {
+	var createInterestingProductsTableSQL string = `CREATE TABLE IF NOT EXISTS InterestingProducts (
+		"uuid" TEXT,
+		"productNum" SMALLINTGER
+		);` // SQL Statement to create a table of interesting products (if not existing)
+	// NB : SMALLINT can go up to 32767 : far enough
+	log.Println("Création ou ouverture d'une table des produits intéressants...")
+	statement, err := db.Prepare(createInterestingProductsTableSQL) // Prepare my SQL Statement
+	if err != nil {	log.Panic(err) }
+	defer statement.Close()				
+	statement.Exec() // Execute my SQL Statement
+	if err != nil { log.Panic(err) }		
+	log.Println("Table des produits intéressants créée...")
+}
+
+func UpdateInterestingProducts(db *sql.DB, unique_id string, produits [] bool) {
+	// 1) Remove old records
+	var deleteOldInterestingProductsSQL string = `DELETE from InterestingProducts WHERE uuid = ?` // important : PRIMARY KEY = uuid
+	statement, err := db.Prepare(deleteOldInterestingProductsSQL) // Prepare statement.
+	// should avoid SQL injections
+	if err != nil { log.Panic(err) }
+	defer statement.Close()	
+	_, err = statement.Exec(unique_id)
+	if err != nil { log.Panic(err) }
+	// 2) Add new records
+	var updateInterestingProductsSQL string = `INSERT INTO InterestingProducts(uuid, productNum) VALUES (?, ?)`
+	for i:=0;i<len(produits);i++ {
+		if (produits[i]) {
+			statement, err = db.Prepare(updateInterestingProductsSQL) // Prepare statement.					
+			if err != nil { panic(err) }			
+			_, err = statement.Exec(unique_id, i+1) // First product starts at 1, not 0
+			if err != nil { panic(err) }			
+			// Hummm, here, later there will be a correspondance table or array to point from relative product number to absolute product number.
+			// Typically, something like Corresp[i] will give a number which will be the absolute product number corresponding to the local product number being i.
+			// FOR THE MOMENT I assume that this relative product number is an absolute product number
+			// The Corresp array will be filled in either using a json file or a database table
+		}
+	}
+}
+
+
 // TO DO : to get the clients (from the vuejs side), improve the following function
 func displayClients(db *sql.DB) {
 	row, err := db.Query("SELECT * FROM clients ORDER BY nom")
@@ -176,7 +235,7 @@ func displayClients(db *sql.DB) {
 		var prenom string
 		var telephone string
 		var mail string	
-		var produits [MTT_MAX_PRODUCTS] int
+		var produits [] bool
 		row.Scan(&nom, &prenom, &telephone, &mail, &produits)
 		log.Println("Client:", nom, prenom, telephone, mail, produits)
 	}
@@ -207,7 +266,7 @@ func sendMail(info *receivedFromMTTchassis) {
 					"mail:" + info.Mail + "\r\n" +
 					"téléphone:" + info.Telephone + "\r\n" +
 					"==> intéressé(e) par les produits :" + "\r\n"
-	for i:=0;i<MTT_MAX_PRODUCTS;i++ {
+	for i:=0;i<len(info.Produits);i++ {
 		if (info.Produits[i]) {		
 			// Hummm, here, later there will be a correspondance table or array to point from relative product number to absolute product number.
 			// Typically, something like Corresp[i] will give a number which will be the absolute product number corresponding to the local product number being i.
