@@ -12,12 +12,14 @@ import (
 	"os"
 	"strconv"
 	"github.com/twinj/uuid"
+	"io/ioutil"	
 )
 
 const MTT_DATABASE string ="MTT-sqlite-database.db"
 const MTT_ACKNOWLEDGE string = "L'entreprise MTT a été informée, merci de votre intérêt"
 // const MTT_MAX_PRODUCTS int = 7    I use a slice so no need to handle the size !
 const MTT_NO_ROWS_IN_RESULT_SET string = "sql: no rows in result set"
+const MTT_JSON_NAME string = "MTTchassis.json"
 	
 /* TO DO : improve error handling later on with this kind of treatment
 // To put inside a function
@@ -117,7 +119,7 @@ func createClientTable(db *sql.DB) {
 	statement, err := db.Prepare(createClientTableSQL) // Prepare my SQL Statement
 	if err != nil {	log.Panic(err) }
 	defer statement.Close()				
-	statement.Exec() // Execute my SQL Statement
+	_, err = statement.Exec() // Execute my SQL Statement
 	if err != nil { log.Panic(err) }	
 	log.Println("Table des clients créée ou ouverte...")
 }
@@ -187,14 +189,14 @@ func createOrUpdateInterestingProducts(db *sql.DB, unique_id string, products []
 func createInterestingProductsTable(db *sql.DB) {
 	var createInterestingProductsTableSQL string = `CREATE TABLE IF NOT EXISTS InterestingProducts (
 		"uuid" TEXT,
-		"productNum" SMALLINTGER
+		"productNum" SMALLINT
 		);` // SQL Statement to create a table of interesting products (if not existing)
 	// NB : SMALLINT can go up to 32767 : far enough
 	log.Println("Création ou ouverture d'une table des produits intéressants...")
 	statement, err := db.Prepare(createInterestingProductsTableSQL) // Prepare my SQL Statement
 	if err != nil {	log.Panic(err) }
 	defer statement.Close()				
-	statement.Exec() // Execute my SQL Statement
+	_, err = statement.Exec() // Execute my SQL Statement
 	if err != nil { log.Panic(err) }		
 	log.Println("Table des produits intéressants créée...")
 }
@@ -238,6 +240,108 @@ func displayClients(db *sql.DB) {
 		var produits [] bool
 		row.Scan(&nom, &prenom, &telephone, &mail, &produits)
 		log.Println("Client:", nom, prenom, telephone, mail, produits)
+	}
+}
+
+func createProductsTableFromJson(myjson string) {
+	// First : read the json content and fill in a structure
+	type Product struct {
+		ProductID			string	`json:"productID"`
+		ProductName			string	`json:"productName"`
+		ProductDescription	string	`json:"productDescription"`
+		ProductLink			string	`json:"productLink"`
+		ProductPrice		int 	`json:"productPrice"`
+		ProductDelay		string	`json:"productDelay"`
+		ProductActive		bool	`json:"productActive`
+		ProductDateAdded	string	`json:"productDateAdded"`
+	}
+
+	type Products struct {
+		JsonName		string `json:"jsonName"`
+		Version			string `json:"version"`
+		CreationDate	string `json:"creationData"`
+		LastUpdate		string `json:"lastUpdate"`
+		LastUpdater		string `json:"lastUpdater"`
+		Products []Product     `json:"products"`
+	}
+
+	// Open our jsonFile
+	jsonFile, err := os.Open(myjson)
+	// if we os.Open returns an error then handle it
+	if err != nil { panic(err) }
+	// defer the closing of our jsonFile so that we can parse
+	defer jsonFile.Close()
+
+	// read our opened jsonFile as a byte array.
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	// we initialize our Users array
+	var products Products
+
+	// we unmarshal our byteArray which contains our
+	// jsonFile's content into 'products' which we defined above
+	json.Unmarshal(byteValue, &products)
+
+	// 2) Write the structure content inside a table of my database ? (not mandatory)
+	// return // because maybe the json is enough to handle all that
+	// 2.1) Create database if not existing
+	if (!nodeExists(MTT_DATABASE)) {
+		file, err := os.Create(MTT_DATABASE)
+		if err != nil {	log.Panic(err) }
+		file.Close()
+	}
+	sqliteDatabase, err := sql.Open("sqlite", MTT_DATABASE) // Open my SQL base
+	if err != nil {	panic(err) }
+	defer sqliteDatabase.Close()
+	// 2.2) create products table if not existing
+	var createProductsTableSQL string = `CREATE TABLE IF NOT EXISTS Products (
+		"productID" TEXT,
+		"productName" TEXT,
+		"productDescription" TEXT,
+		"productLink" TEXT,
+		"productPrice" SMALLINT UNSIGNED,
+		"productDelay" TEXT,
+		"productActive" BIT,
+		"productDateAdded" TEXT
+		);` // SQL Statement to create a table of products (if not existing)
+	// NB : SMALLINT UNSIGNED can go up to 65535 : used for a price
+	// NB : BIT can be 0 (false) or 1 (true)
+	statement, err := sqliteDatabase.Prepare(createProductsTableSQL) // Prepare my SQL Statement
+	if err != nil {	panic(err) }
+	defer statement.Close()				
+	_, err = statement.Exec() // Execute my SQL Statement
+	if err != nil { panic(err) }		
+	// 2.3) Remove old records (if any)
+	var deleteOldProductsSQL string = `DELETE from Products`
+	statement, err = sqliteDatabase.Prepare(deleteOldProductsSQL) // Prepare statement.
+	if err != nil { log.Panic(err) }
+	_, err = statement.Exec()
+	if err != nil { log.Panic(err) }
+	// 2.4) Now insert the products in the database
+	var insertProductsSQL string = `INSERT INTO Products(
+		productID,
+		productName,
+		productDescription,
+		productLink,
+		productPrice,
+		productDelay,
+		productActive,
+		productDateAdded)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+	statement, err = sqliteDatabase.Prepare(insertProductsSQL) // Prepare statement.
+	if err != nil { log.Panic(err) }
+	var b uint8
+	for i:=0; i<len(products.Products); i++ {
+		if (products.Products[i].ProductActive) {b=1} else {b=0}
+		_, err = statement.Exec(products.Products[i].ProductID,
+								products.Products[i].ProductName,
+								products.Products[i].ProductDescription,
+								products.Products[i].ProductLink,
+								products.Products[i].ProductPrice,
+								products.Products[i].ProductDelay,
+								b, // products.Products[i].ProductActive
+								products.Products[i].ProductDateAdded)
+		if err != nil { log.Panic(err) }
 	}
 }
 
@@ -294,9 +398,8 @@ func sendMail(info *receivedFromMTTchassis) {
 
 
 func main() {
-//	u := uuid.NewV4()	
-//	fmt.Println(u.String() + "sdfsdf" + "slksdlf")
-//	return
+	//createProductsTableFromJson(MTT_JSON_NAME)
+	//return
 	http.HandleFunc("/", mttChassis)
 	http.ListenAndServe(":8090", nil)
 }
