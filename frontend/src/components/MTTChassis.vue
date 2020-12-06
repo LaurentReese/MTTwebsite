@@ -79,25 +79,51 @@
     <b>
       Nom{{ espace }}{{ espace }}{{ espace }}{{ espace }}{{ espace }}{{ espace
       }}{{ espace }}{{ espace }}{{ espace }}{{ espace }}{{ espace
-      }}{{ espace }} <input v-model="nom" />
+      }}{{ espace }} <input type="text" v-model="nom" />
+      *
       <pre></pre>
       Prénom{{ espace }}{{ espace }}{{ espace }}{{ espace }}{{ espace
-      }}{{ espace }} <input v-model="prenom" />
+      }}{{ espace }} <input type="text" v-model="prenom" />
       <pre></pre>
       Téléphone{{ espace }}{{ espace }} <input v-model="telephone" />
       <pre></pre>
       E-mail{{ espace }}{{ espace }}{{ espace }}{{ espace }}{{ espace
       }}{{ espace }}{{ espace }}{{ espace }}{{ espace }}
-      <input v-model="mail" />
+      <input type="email" v-model="mail" />
+      *
       <pre></pre>
+      <br />
+      <span>Commentaire optionnel :</span>
+      <br />
+      <pre></pre>
+      <textarea
+        v-model="messClient"
+        style="width:600px;"
+        height="300"
+        placeholder="Ajoutez une ou plusieurs lignes"
+      ></textarea>
+      <p v-if="errors.length">
+        <b>SVP corrigez :</b>
+        <pre>  <!--jump a line-->
+          <template class="laurent" v-for="problem in errors">
+            {{problem}}
+          </template>    
+        </pre>                
+        <!--ul>
+          <instead of the loop    {{errors}}   >
+          <li v-for="(problem, index) in errors"  v-bind:key="index">
+            {{problem}}
+          </li>
+        </ul-->
+      </p>
+      <h1>
+        {{ espace }}{{ espace }}{{ espace }}{{ espace }}{{ espace }} {{ espace
+        }}{{ espace }}{{ espace }}{{ espace }}{{ espace }}
+        <button class="button btn-primary" v-on:click="postMTTchassis">
+          INFORMER MTT
+        </button>
+      </h1>
     </b>
-    <h1>
-      {{ espace }}{{ espace }}{{ espace }}{{ espace }}{{ espace }} {{ espace
-      }}{{ espace }}{{ espace }}{{ espace }}{{ espace }}
-      <button class="button btn-primary" v-on:click="postMTTchassis">
-        INFORMER MTT
-      </button>
-    </h1>
     <pre></pre>
     <pre></pre>
   </div>
@@ -114,7 +140,7 @@ export default {
 
   data: function () {
     return {
-      produits: Boolean [7],
+      produits: Boolean[7],
       isPlaying: false,
       chassis1: false, // TO DO : of course array of bool to regroup all my choices
       chassis2: false, // TO DO : of course array of bool to regroup all my choices
@@ -128,6 +154,8 @@ export default {
       telephone: "",
       mail: "",
       espace: "\xa0",
+      messClient: "",
+      errors: [],
     };
   },
 
@@ -143,15 +171,27 @@ export default {
       this.isPlaying = !this.isPlaying;
     },
     postMTTchassis: function () {
+      if (!this.checkForm(this.nom, this.mail)) return;
+
       // TO DO : take time to find the way to handle directly the array items from/to the view
-      this.produits = [this.chassis1, this.chassis2, this.chassis3, this.chassis4, this.chassis5, this.chassis6, this.chassis7]
+      // seems the mess from my first investigation...
+      this.produits = [
+        this.chassis1,
+        this.chassis2,
+        this.chassis3,
+        this.chassis4,
+        this.chassis5,
+        this.chassis6,
+        this.chassis7,
+      ];
 
       var dataFromMTT = {
         nom: this.nom,
         prenom: this.prenom,
         telephone: this.telephone,
         mail: this.mail,
-        produits : this.produits
+        produits: this.produits,
+        messClient: this.messClient,
       };
 
       console.log(dataFromMTT);
@@ -164,12 +204,27 @@ export default {
       })
         .then((result) => {
           console.log(result.data);
-          alert(result.data["messageServer"])
+          alert(result.data["messageServer"]);
         })
         .catch((error) => {
           console.error(error);
-          alert("Serveur MTT indisponible")
+          alert("Serveur MTT indisponible");
         });
+    },
+    checkForm: function (name, email) {
+      this.errors = [];
+      if (!name) this.errors.push("Nom requis.");
+      if (!email) {
+        this.errors.push("Email requis.");
+      } else if (!this.validEmail(email)) {
+        this.errors.push("L'email est invalide.");
+      }
+      if (!this.errors.length) return true;
+      return false;
+    },
+    validEmail: function (email) {
+      var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
     },
   },
 };

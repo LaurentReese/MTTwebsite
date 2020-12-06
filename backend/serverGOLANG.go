@@ -34,6 +34,7 @@ type receivedFromMTTchassis struct {
 	Telephone string `json:"telephone"`
 	Mail string `json:"mail"`
 	Produits [MTT_MAX_PRODUCTS] bool `json:"produits"` // TO DO : a slice instead of an array ?
+	MessClient string `json:"messClient"`
 }
 
 // data coming from my vuejs client
@@ -190,9 +191,7 @@ func sendMail(info *receivedFromMTTchassis) {
 	password := "d<5@M48c6UyDz]" // password is here in clear but I don't care as it's an old useless account
 
 	// Receiver email address.
-	to := []string{
-	"rene.lasurete@gmail.com",
-	}
+	to := []string{	"rene.lasurete@gmail.com" }
 
 	// mail from myself to myself, just to create an entry to store a customer action ;-)
 
@@ -205,6 +204,7 @@ func sendMail(info *receivedFromMTTchassis) {
 					"mail:" + info.Mail + "\r\n" +
 					"téléphone:" + info.Telephone + "\r\n" +
 					"==> intéressé(e) par les produits :" + "\r\n"
+
 	for i:=0;i<MTT_MAX_PRODUCTS;i++ {
 		if (info.Produits[i]) {		
 			// Hummm, here, later there will be a correspondance table or array to point from relative product number to absolute product number.
@@ -216,7 +216,8 @@ func sendMail(info *receivedFromMTTchassis) {
 		}
 	}
 
-	fmt.Println(messageString)
+	if info.MessClient != "" { messageString += "Message Client :" + "\r\n" + info.MessClient }
+	//fmt.Println(messageString)
 	message := [] byte (messageString)	// fmt.Println(message) would give only numbers
 
 	// Authentication.
