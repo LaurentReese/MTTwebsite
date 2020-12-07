@@ -48,6 +48,7 @@ func createClientTable(db *sql.DB) {
 		"prenom" TEXT,
 		"telephone" TEXT,
 		"mail" TEXT,
+		"messClient" TEXT,
 		"uuid" TEXT,
 		PRIMARY KEY ("nom","mail")			
 		);` // SQL Statement for Creating a clients table (if not existing)
@@ -88,11 +89,11 @@ func insertClient(db *sql.DB, newClient *receivedFromMTTchassis) {
 		// 2) Update the existing record
 		log.Println("Client déjà existant...")
 		log.Println("Mise à jour du client existant...")		
-		var insertClientSQL string = `UPDATE clients SET prenom = ?, telephone = ? WHERE nom = ? AND mail = ?` // important : PRIMARY KEY = ("nom","mail")
+		var insertClientSQL string = `UPDATE clients SET prenom = ?, telephone = ?, messClient = ? WHERE nom = ? AND mail = ?` // important : PRIMARY KEY = ("nom","mail")
 		statement, err = db.Prepare(insertClientSQL) // Prepare statement.
 		// should avoid SQL injections
 		if err != nil { log.Panic(err) }
-		_, err = statement.Exec(newClient.Prenom, newClient.Telephone, newClient.Nom, newClient.Mail) // proper code should be (*newClient).Prenom, (*newClient).Telephone ...
+		_, err = statement.Exec(newClient.Prenom, newClient.Telephone, newClient.MessClient, newClient.Nom, newClient.Mail) // proper code should be (*newClient).Prenom, (*newClient).Telephone ...
 		if err != nil { log.Panic(err) }
 		log.Println("Client existant mis à jour...")
 		// DONE: update of the client record
@@ -103,13 +104,13 @@ func insertClient(db *sql.DB, newClient *receivedFromMTTchassis) {
 		// FOR THE MOMENT I assume that this relative product number is an absolute product number
 		// The Corresp array will be filled in either using a json file or a database table
 
-		var insertClientSQL string = `INSERT INTO clients(nom, prenom, telephone, mail, uuid) VALUES (?, ?, ?, ?, ?)`
+		var insertClientSQL string = `INSERT INTO clients(nom, prenom, telephone, mail, messClient, uuid) VALUES (?, ?, ?, ?, ?, ?)`
 		// N.B. It would have liked to perform a WHERE NOT EXISTS (SELECT * FROM clients WHERE nom = ? AND mail = ? )
 		// But (after many trials) it seems it does not work with sqlite (and/or GOLANG ?). Never mind, to make it work I've done the steps 1) and 2) just above
 		statement, err = db.Prepare(insertClientSQL) // Prepare statement.
 														// should avoid SQL injections
 		if err != nil { panic(err) }
-		_, err = statement.Exec(newClient.Nom, newClient.Prenom, newClient.Telephone, newClient.Mail, unique_id) //, newClient.Nom, newClient.Mail) // (*newClient).Nom, (*newClient).Prenom, (*newClient).Telephone, (*newClient).Mail, (*newClient).Nom, (*newClient).Mail)
+		_, err = statement.Exec(newClient.Nom, newClient.Prenom, newClient.Telephone, newClient.Mail, newClient.MessClient, unique_id) //, newClient.Nom, newClient.Mail) // (*newClient).Nom, (*newClient).Prenom, (*newClient).Telephone, (*newClient).Mail, (*newClient).Nom, (*newClient).Mail)
 		if err != nil { log.Panic(err) }
 		log.Println("Nouveau client ajouté...")
 	}
