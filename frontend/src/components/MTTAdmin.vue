@@ -25,6 +25,7 @@ export default {
     return {
       askPassword: false,
       password: "",
+      espace: "\xa0"
     };
   },
 
@@ -36,7 +37,8 @@ export default {
       this.askPassword = !this.askPassword; // toggle state
     },
     postMTTValidatePassword: function () {
-      if (this.password == "") { // no need to get the server's answer in that case
+      if (this.password == "") {
+        // no need to get the server's answer in that case
         alert("Le mot de passe est vide");
         return;
       }
