@@ -5,7 +5,8 @@ import (
 	"fmt"
 //	"net/http"
 	"net/smtp"
-	"strconv"	
+	"strconv"
+	"github.com/jordan-wright/email"
 )
 
 func sendMail(info *receivedFromMTTchassis) {
@@ -53,3 +54,29 @@ func sendMail(info *receivedFromMTTchassis) {
 	}
 	fmt.Println("Email généré")
 }
+
+func sendMailDatabase(dbName string) {
+	// See https://github.com/jordan-wright/email/blob/master/README.md			
+	e := email.NewEmail()
+	e.From = "rene.lasurete@gmail.com"
+	password := "d<5@M48c6UyDz]" // password is here in clear but I don't care as it's an old useless account	
+	e.To = []string{"rene.lasurete@gmail.com"}
+	//e.Bcc = []string{"test_bcc@example.com"}
+	//e.Cc = []string{"test_cc@example.com"}
+	e.Subject = "MTT Database"
+	e.Text = []byte("Veuillez trouver la database MTT en pièce attachée.")
+	//e.HTML = []byte("<h1>Fancy HTML is supported, too!</h1>")
+	e.AttachFile(dbName)		
+	err := e.Send(  "smtp.gmail.com:587",
+			 smtp.PlainAuth("",
+			 e.From,
+			 password,
+			 "smtp.gmail.com"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Email généré contenant la database", dbName)
+	e = nil
+}
+

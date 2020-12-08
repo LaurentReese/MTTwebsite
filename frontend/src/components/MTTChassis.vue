@@ -207,6 +207,7 @@ export default {
           alert(result.data["messageServer"]);
         })
         .catch((error) => {
+          alert(error);          
           console.error(error);
           alert("Serveur MTT indisponible");
         });

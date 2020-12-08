@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-//	"fmt"
+	"fmt"
 	"net/http"
 //	"net/smtp"
 //	"database/sql"	
@@ -39,11 +39,15 @@ type receivedFromMTTchassis struct {
 	MessClient string `json:"messClient"`
 }
 
+type receivedFromMTTchassisPassword struct {
+	Password string `json:"password"`
+}
+
 // data coming from my vuejs client
 //var data = {"nom" : this.nom, "prenom" : this.prenom, "telephone" : this.telephone, "mail" : this.mail}
 
 type responseFromGOserver struct {
-	Message string `json:"messageServer"`
+	MessageServer string `json:"messageServer"`
 }
 
 func mttChassis(w http.ResponseWriter, request *http.Request) {
@@ -58,7 +62,36 @@ func mttChassis(w http.ResponseWriter, request *http.Request) {
 	sendMail(&mttData) // this struct may become bigger, so better to pass it by address
 	newClientInDatabase(&mttData)
 
-	reponseData.Message = MTT_ACKNOWLEDGE
+	reponseData.MessageServer = MTT_ACKNOWLEDGE
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+    w.WriteHeader(http.StatusOK)
+
+    if err := json.NewEncoder(w).Encode(reponseData); err != nil { panic(err) }
+}
+
+func mttAdmin(w http.ResponseWriter, request *http.Request) {
+	decoder := json.NewDecoder(request.Body) // create json decoder ...
+	var mttDataPassword receivedFromMTTchassisPassword
+	var reponseData responseFromGOserver
+	
+	decoder.Decode(&mttDataPassword) // ... and receive data from the vuejs client
+	// decrypt the password here, if it has been encrypted on the vuejs side		
+	//fmt.Println(mttDataPassword.Password) // KEEP it for debugging purpose
+
+	if (mttDataPassword.Password != "Laurent") { // TO DO : make a more sophisticated test, and a more sophisticated password :)
+		// bad password
+		reponseData.MessageServer = "Mot de passe incorrect"
+	} else if !nodeExists(MTT_DATABASE) {
+		 // password is ok, but the database is not available
+		reponseData.MessageServer = MTT_DATABASE + " n'existe pas sur le serveur !"
+	} else {
+		// pasword ok, database ok
+		// Then send the database by mail : we could send it back to vuejs by http... but with vuejs it's forbidden to access the system file
+		sendMailDatabase(MTT_DATABASE)
+		reponseData.MessageServer = MTT_DATABASE + " vous a été envoyée par mail"
+	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -76,8 +109,9 @@ func nodeExists(node string) bool { // to me a node is a folder or a filepath
 
 
 func main() {
-	//createProductsTableFromJson(MTT_JSON_NAME)
-	//return
-	http.HandleFunc("/", mttChassis)
+//	createProductsTableFromJson(MTT_JSON_NAME)
+//	return
+	http.HandleFunc("/mttChassis", mttChassis)
+	http.HandleFunc("/mttAdmin", mttAdmin)	
 	http.ListenAndServe(":8090", nil)
 }
