@@ -181,7 +181,7 @@ func displayClients(db *sql.DB) {
 	}
 }
 
-func createProductsTableFromJson(myjson string) {
+func createProductsTableFromJson(jsonName string) {
 	// First : read the json content and fill in a structure
 	type Product struct {
 		ProductID			string	`json:"productID"`
@@ -204,7 +204,7 @@ func createProductsTableFromJson(myjson string) {
 	}
 
 	// Open our jsonFile
-	jsonFile, err := os.Open(myjson)
+	jsonFile, err := os.Open(jsonName)
 	// if we os.Open returns an error then handle it
 	if err != nil { panic(err) }
 	// defer the closing of our jsonFile so that we can parse

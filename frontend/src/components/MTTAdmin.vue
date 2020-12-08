@@ -1,13 +1,18 @@
 <template>
   <div class="MTTAdmin">
-    <button v-on:click="postMTTAdmin">admin</button>
+    <button v-on:click="MTTAdmin">admin</button>
     <span v-if="askPassword">
       {{ espace }}
       Entrez un mot de passe :
       {{ espace }}
       <input type="text" v-model="password" />
       {{ espace }}
-      <button v-on:click="postMTTValidatePassword">OK</button>
+      <br /><br />
+      <button v-on:click="MTTDatabaseAction">
+        Recevoir la database par mail
+      </button>
+      <br /><br />
+      <button v-on:click="MTTJsonAction">Mettre à jour les produits</button>
     </span>
   </div>
 </template>
@@ -25,34 +30,27 @@ export default {
     return {
       askPassword: false,
       password: "",
-      espace: "\xa0"
+      espace: "\xa0",
     };
   },
-
-  props: {},
-
   methods: {
-    postMTTAdmin: function () {
+    MTTAdmin: function () {
       this.password = "";
       this.askPassword = !this.askPassword; // toggle state
     },
-    postMTTValidatePassword: function () {
+
+    MTTDatabaseAction: function () {
       if (this.password == "") {
         // no need to get the server's answer in that case
         alert("Le mot de passe est vide");
         return;
       }
-      // TO DO : encrypt the password here, it will be decrypted on the server side
-      // This is better in case one day HTTP is used instead of HTTPS
-      this.askForDatabaseByMail(this.password);
-    },
-    askForDatabaseByMail(password) {
       var dataFromMTTPassword = {
         password: this.password,
       };
       axios({
         method: "POST",
-        url: "http://127.0.0.1:8090/mttAdmin",
+        url: "http://127.0.0.1:8090/mttDatabaseAction",
         data: dataFromMTTPassword,
         headers: { "content-type": "text/plain" },
       })
@@ -65,6 +63,37 @@ export default {
           console.error(error);
           alert("Serveur MTT indisponible");
         });
+    },
+
+    MTTJsonAction: function () {
+      if (this.password == "") {
+        // no need to get the server's answer in that case
+        alert("Le mot de passe est vide");
+        return;
+      }
+      // Lire un .json des produits
+      // Vérifier la syntaxe du .json
+      // L'envoyer au serveur GOLANG
+      // L'intégrer dans la database (le code est déjà fait)
+
+      // appeler
+      /*
+            axios({
+        method: "POST",
+        url: "http://127.0.0.1:8090/mttJsonAction",
+        data: dataFromMTTPassword,
+        headers: { "content-type": "text/plain" },
+      })
+        .then((result) => {
+          console.log(result.data);
+          alert(result.data["messageServer"]);
+        })
+        .catch((error) => {
+          alert(error);
+          console.error(error);
+          alert("Serveur MTT indisponible");
+        });
+        */
     },
   },
 };
