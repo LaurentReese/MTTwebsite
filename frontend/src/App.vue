@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <img alt="MTT logo" src="./assets/MTT.jpg" img width="5%">
+    <img alt="MTT logo" src="./assets/LOGO MTT HABITAT.png" img width="5%">
     <MTTAdmin />
     <MTTChassis msg1="Bienvenue sur le site de MÉDITERRANÉE TECHNIQUES ET TRAVAUX" msg2="Présentation des chassis de fenêtre"/>
   </div>

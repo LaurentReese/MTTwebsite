@@ -1,11 +1,12 @@
 <template>
   <div class="MTTAdmin">
+    {{ espace }} {{ espace }}
     <button v-on:click="MTTAdmin">admin</button>
     <span v-if="askPassword">
       {{ espace }}
       Entrez un mot de passe :
       {{ espace }}
-      <input type="text" v-model="password" />
+      <input type="password" v-model="password" />
       {{ espace }}
       <br /><br />
       <button v-on:click="MTTDatabaseAction">
