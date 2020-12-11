@@ -36,6 +36,7 @@ type receivedFromMTTchassis struct {
 	Telephone string `json:"telephone"`
 	Mail string `json:"mail"`
 	Produits [] bool `json:"produits"` // a slice instead of an array !
+	AddrTravaux string `json:"addrTravaux"`		
 	MessClient string `json:"messClient"`
 }
 
@@ -105,7 +106,9 @@ func mttDatabaseAction(w http.ResponseWriter, request *http.Request) {
 }
 
 func mttJsonAction(w http.ResponseWriter, request *http.Request) {
-
+//	if json.Valid(input) {
+		// input contains valid json
+//	}
 }
 
 func nodeExists(node string) bool { // to me a node is a folder or a filepath

@@ -39,7 +39,10 @@ func sendMail(info *receivedFromMTTchassis) {
 		}
 	}
 
-	if info.MessClient != "" { messageString += "Message Client :" + "\r\n" + info.MessClient }
+	messageString += "\r\n"
+	if info.AddrTravaux != "" { messageString += "Adresse travaux :" + "\r\n" + info.AddrTravaux + "\r\n\r\n"}
+	
+	if info.MessClient != "" { messageString += "Message Client :" + "\r\n" + info.MessClient + "\r\n"}
 	//fmt.Println(messageString)
 	message := [] byte (messageString)	// fmt.Println(message) would give only numbers
 

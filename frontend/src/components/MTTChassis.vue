@@ -76,6 +76,7 @@
     <input type="checkbox" name="chassis7" value="valeur" v-model="chassis7" />
     Je suis intéressé par ce produit
     <hr />
+    <br />
     <b>
       Nom{{ espace }}{{ espace }}{{ espace }}{{ espace }}{{ espace }}{{ espace
       }}{{ espace }}{{ espace }}{{ espace }}{{ espace }}{{ espace
@@ -91,17 +92,35 @@
       }}{{ espace }}{{ espace }}{{ espace }}{{ espace }}
       <input type="email" v-model="mail" />
       *
+      <br />
+      <br />      
+      <span>Adresse de livraison ou des travaux :</span>
+      <br />
       <pre></pre>
+
+      <textarea
+        v-model="addrTravaux"
+        style="width:600px;"
+        height="300"
+        placeholder="Ajoutez une ou plusieurs lignes"
+      ></textarea>
+
+
+      <br />
       <br />
       <span>Commentaire optionnel :</span>
       <br />
       <pre></pre>
+
       <textarea
         v-model="messClient"
         style="width:600px;"
         height="300"
         placeholder="Ajoutez une ou plusieurs lignes"
       ></textarea>
+
+
+
       <p v-if="errors.length">
         <b>SVP corrigez :</b>
         <pre>  <!--jump a line-->
@@ -155,6 +174,7 @@ export default {
       mail: "",
       espace: "\xa0",
       messClient: "",
+      addrTravaux: "",
       errors: [],
     };
   },
@@ -191,6 +211,7 @@ export default {
         telephone: this.telephone,
         mail: this.mail,
         produits: this.produits,
+        addrTravaux: this.addrTravaux,        
         messClient: this.messClient,
       };
 
@@ -207,7 +228,7 @@ export default {
           alert(result.data["messageServer"]);
         })
         .catch((error) => {
-          alert(error);          
+          alert(error);
           console.error(error);
           alert("Serveur MTT indisponible");
         });
