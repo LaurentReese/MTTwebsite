@@ -27,7 +27,7 @@ func sendMail(info *receivedFromMTTchassis) {
 	messageString := "Message reçu de la part de " + info.Prenom + " " + info.Nom + "\r\n" +
 					"mail:" + info.Mail + "\r\n" +
 					"téléphone:" + info.Telephone + "\r\n" +
-					"==> intéressé(e) par les produits :" + "\r\n"
+					"==> intéressé(e) par le(s) produit(s) :" + "\r\n"
 	for i:=0;i<len(info.Produits);i++ {
 		if (info.Produits[i]) {		
 			// Hummm, here, later there will be a correspondance table or array to point from relative product number to absolute product number.
