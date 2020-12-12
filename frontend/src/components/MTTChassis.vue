@@ -241,6 +241,7 @@ export default {
       } else if (!this.validEmail(email)) {
         this.errors.push("L'email est invalide.");
       }
+      if (!this.validProducts()) this.errors.push("Vous devez sélectionner au moins un produit.");
       if (!this.errors.length) return true;
       return false;
     },
@@ -248,6 +249,10 @@ export default {
       var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(email);
     },
+    validProducts : function () {
+      if (this.chassis1 || this.chassis2 || this.chassis3 || this.chassis4 || this.chassis5 || this.chassis6 || this.chassis7) return true;
+      return false; // TO DO : of course array of bool to regroup all my choices
+    }
   },
 };
 </script>
