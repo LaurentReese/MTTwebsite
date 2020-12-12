@@ -1,6 +1,5 @@
 <template>
   <div class="MTTAdmin">
-    {{ espace }} {{ espace }}
     <button v-on:click="MTTAdmin">admin</button>
     <span v-if="askPassword">
       {{ espace }}
@@ -14,30 +13,44 @@
       </button>
       <br /><br />
       <button v-on:click="MTTJsonAction">Mettre à jour les produits</button>
+      <br /><br />
+      <MTTFileSelect v-model="file"></MTTFileSelect>
+      <p v-if="file">==> {{ file.path }}{{ file.name }}</p>
     </span>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+// SELECT FILE : see https://www.digitalocean.com/community/tutorials/vuejs-file-select-component
+import axios from "axios"
+import MTTFileSelect from './MTTFileSelect.vue'
 //import Vue from 'vue'
 // import VeeValidate from 'vee-validate'
 /* eslint-disable */
 //Vue.use(VeeValidate)
 export default {
+  components : {
+    MTTFileSelect
+  },
   name: "MTTAdmin",
 
   data: function () {
     return {
+      file: null,
       askPassword: false,
+      essai: false,
       password: "",
       espace: "\xa0",
     };
   },
   methods: {
+    handleFileChange(e) {
+      this.$emit("input", e.target.files[0]);
+    },
     MTTAdmin: function () {
       this.password = "";
       this.askPassword = !this.askPassword; // toggle state
+      this.file = null;
     },
 
     MTTDatabaseAction: function () {
@@ -72,6 +85,8 @@ export default {
         alert("Le mot de passe est vide");
         return;
       }
+      alert(this.file.name);
+      let reader = new FileReader();      
       // Lire un .json des produits
       // Vérifier la syntaxe du .json
       // L'envoyer au serveur GOLANG
@@ -116,4 +131,5 @@ li {
 a {
   color: #42b983;
 }
+
 </style>
