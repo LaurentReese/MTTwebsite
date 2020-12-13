@@ -285,3 +285,98 @@ func createProductsTableFromJson(jsonName string) {
 		if err != nil { log.Panic(err) }
 	}
 }
+
+func createProductsTableFromJsonContent(jsonByteArray [] byte) bool {
+	// First : read the json content and fill in a structure
+	type Product struct {
+		ProductID			string	`json:"productID"`
+		ProductName			string	`json:"productName"`
+		ProductDescription	string	`json:"productDescription"`
+		ProductLink			string	`json:"productLink"`
+		ProductPrice		int 	`json:"productPrice"`
+		ProductDelay		string	`json:"productDelay"`
+		ProductActive		bool	`json:"productActive`
+		ProductDateAdded	string	`json:"productDateAdded"`
+	}
+
+	type Products struct {
+		JsonName		string `json:"jsonName"`
+		Version			string `json:"version"`
+		CreationDate	string `json:"creationData"`
+		LastUpdate		string `json:"lastUpdate"`
+		LastUpdater		string `json:"lastUpdater"`
+		Products []Product     `json:"products"`
+	}
+
+	// we initialize our Users array
+	var products Products
+
+	// we unmarshal our byteArray which contains our
+	// jsonFile's content into 'products' which we defined above
+	err := json.Unmarshal(jsonByteArray, &products)
+	if err != nil || len(products.Products)==0 { return false }
+
+	// 2) Write the structure content inside a table of my database ? (not mandatory)
+	// return // because maybe the json is enough to handle all that
+	// 2.1) Create database if not existing
+	if (!nodeExists(MTT_DATABASE)) {
+		file, err := os.Create(MTT_DATABASE)
+		if err != nil {	log.Panic(err) }
+		file.Close()
+	}
+	sqliteDatabase, err := sql.Open("sqlite", MTT_DATABASE) // Open my SQL base
+	if err != nil {	panic(err) }
+	defer sqliteDatabase.Close()
+	// 2.2) create products table if not existing
+	var createProductsTableSQL string = `CREATE TABLE IF NOT EXISTS Products (
+		"productID" TEXT,
+		"productName" TEXT,
+		"productDescription" TEXT,
+		"productLink" TEXT,
+		"productPrice" SMALLINT UNSIGNED,
+		"productDelay" TEXT,
+		"productActive" BIT,
+		"productDateAdded" TEXT
+		);` // SQL Statement to create a table of products (if not existing)
+	// NB : SMALLINT UNSIGNED can go up to 65535 : used for a price
+	// NB : BIT can be 0 (false) or 1 (true)
+	statement, err := sqliteDatabase.Prepare(createProductsTableSQL) // Prepare my SQL Statement
+	if err != nil {	panic(err) }
+	defer statement.Close()				
+	_, err = statement.Exec() // Execute my SQL Statement
+	if err != nil { panic(err) }		
+	// 2.3) Remove old records (if any)
+	var deleteOldProductsSQL string = `DELETE from Products`
+	statement, err = sqliteDatabase.Prepare(deleteOldProductsSQL) // Prepare statement.
+	if err != nil { log.Panic(err) }
+	_, err = statement.Exec()
+	if err != nil { log.Panic(err) }
+	// 2.4) Now insert the products in the database
+	var insertProductsSQL string = `INSERT INTO Products(
+		productID,
+		productName,
+		productDescription,
+		productLink,
+		productPrice,
+		productDelay,
+		productActive,
+		productDateAdded)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+	statement, err = sqliteDatabase.Prepare(insertProductsSQL) // Prepare statement.
+	if err != nil { log.Panic(err) }
+	var b uint8
+	for i:=0; i<len(products.Products); i++ {
+		if (products.Products[i].ProductActive) {b=1} else {b=0}
+		_, err = statement.Exec(products.Products[i].ProductID,
+								products.Products[i].ProductName,
+								products.Products[i].ProductDescription,
+								products.Products[i].ProductLink,
+								products.Products[i].ProductPrice,
+								products.Products[i].ProductDelay,
+								b, // products.Products[i].ProductActive
+								products.Products[i].ProductDateAdded)
+		if err != nil { log.Panic(err) }
+	}
+	return true;
+}
+

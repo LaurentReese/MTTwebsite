@@ -14,43 +14,59 @@
       <br /><br />
       <button v-on:click="MTTJsonAction">Mettre à jour les produits</button>
       <br /><br />
-      <MTTFileSelect v-model="file"></MTTFileSelect>
-      <p v-if="file">==> {{ file.path }}{{ file.name }}</p>
+      <!--MTTFileSelect v-model="file"></MTTFileSelect>
+      <p v-if="file">==> {{ file.name }}</p-->
+      <input type="file" ref="myFile" @change="selectedFile" /><br />
     </span>
   </div>
 </template>
 
 <script>
 // SELECT FILE : see https://www.digitalocean.com/community/tutorials/vuejs-file-select-component
-import axios from "axios"
-import MTTFileSelect from './MTTFileSelect.vue'
+import axios from "axios";
+
+//import MTTFileSelect from './MTTFileSelect.vue'
 //import Vue from 'vue'
 // import VeeValidate from 'vee-validate'
 /* eslint-disable */
 //Vue.use(VeeValidate)
 export default {
-  components : {
-    MTTFileSelect
+  components: {
+    // MTTFileSelect
   },
   name: "MTTAdmin",
 
   data: function () {
     return {
-      file: null,
+      // file: null,
       askPassword: false,
-      essai: false,
       password: "",
       espace: "\xa0",
+      text: "",
     };
   },
   methods: {
-    handleFileChange(e) {
-      this.$emit("input", e.target.files[0]);
+    selectedFile() {
+      // see: https://www.raymondcamden.com/2019/05/21/reading-client-side-files-for-validation-with-vuejs
+      let file = this.$refs.myFile.files[0];
+      if (!file) /* || file.type !== "text/plain") */ {
+        this.text = ""
+        return;
+      }
+      let reader = new FileReader();
+      reader.readAsText(file, "UTF-8");
+      reader.onload = (evt) => {
+      this.text = evt.target.result;
+      };
+      reader.onerror = (evt) => {
+        console.error(evt);
+      };
     },
+
     MTTAdmin: function () {
       this.password = "";
       this.askPassword = !this.askPassword; // toggle state
-      this.file = null;
+      this.text = ""
     },
 
     MTTDatabaseAction: function () {
@@ -85,19 +101,18 @@ export default {
         alert("Le mot de passe est vide");
         return;
       }
-      alert(this.file.name);
-      let reader = new FileReader();      
-      // Lire un .json des produits
-      // Vérifier la syntaxe du .json
-      // L'envoyer au serveur GOLANG
-      // L'intégrer dans la database (le code est déjà fait)
-
-      // appeler
-      /*
-            axios({
+      if (this.text=="") {
+        alert("Pas de fichier json sélectionné");
+        return;
+      }
+      var dataFromMTTJson = {
+        password: this.password,
+        text: this.text,
+      };
+      axios({
         method: "POST",
         url: "http://127.0.0.1:8090/mttJsonAction",
-        data: dataFromMTTPassword,
+        data: dataFromMTTJson,
         headers: { "content-type": "text/plain" },
       })
         .then((result) => {
@@ -109,9 +124,8 @@ export default {
           console.error(error);
           alert("Serveur MTT indisponible");
         });
-        */
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -131,5 +145,4 @@ li {
 a {
   color: #42b983;
 }
-
 </style>

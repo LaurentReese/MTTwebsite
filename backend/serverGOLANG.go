@@ -44,6 +44,11 @@ type receivedFromMTTchassisPassword struct {
 	Password string `json:"password"`
 }
 
+type receivedFromMTTJson struct {
+	Password string `json:"password"`
+	Text string `json:"text"`
+}
+
 // data coming from my vuejs client
 //var data = {"nom" : this.nom, "prenom" : this.prenom, "telephone" : this.telephone, "mail" : this.mail}
 
@@ -92,7 +97,7 @@ func mttDatabaseAction(w http.ResponseWriter, request *http.Request) {
 		 // password is ok, but the database is not available
 		reponseData.MessageServer = MTT_DATABASE + " n'existe pas sur le serveur !"
 	} else {
-		// pasword ok, database ok
+		// password ok, database ok
 		// Then send the database by mail : we could send it back to vuejs by http... but with vuejs it's forbidden to access the system file
 		sendMailDatabase(MTT_DATABASE)
 		reponseData.MessageServer = MTT_DATABASE + " vous a été envoyée par mail"
@@ -106,9 +111,34 @@ func mttDatabaseAction(w http.ResponseWriter, request *http.Request) {
 }
 
 func mttJsonAction(w http.ResponseWriter, request *http.Request) {
-//	if json.Valid(input) {
-		// input contains valid json
-//	}
+	decoder := json.NewDecoder(request.Body) // create json decoder ...
+	var mttDataJson receivedFromMTTJson
+	var	reponseData responseFromGOserver
+
+	decoder.Decode(&mttDataJson) // ... and receive data from the vuejs client
+
+	if (mttDataJson.Password != "Laurent") { // TO DO : make a more sophisticated test, and a more sophisticated password :)
+		// bad password
+		reponseData.MessageServer = "Mot de passe incorrect"
+	} else {
+		jsonByteArray := [] byte(mttDataJson.Text)
+		if !json.Valid(jsonByteArray) {
+			jsonByteArray = [] byte{}			
+			reponseData.MessageServer = "Erreur de syntaxe dans le fichier json transmis"
+		} else {
+			 if createProductsTableFromJsonContent(jsonByteArray) {
+				reponseData.MessageServer = "Succès : produits intégrés dans la base de données"
+			 } else {
+				reponseData.MessageServer = "Erreur de syntaxe dans le fichier json transmis"
+			 }
+	 	}
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+    w.WriteHeader(http.StatusOK)
+
+    if err := json.NewEncoder(w).Encode(reponseData); err != nil { panic(err) }
 }
 
 func nodeExists(node string) bool { // to me a node is a folder or a filepath
