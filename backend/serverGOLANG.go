@@ -60,13 +60,23 @@ type responseFromGOserver struct {
 // But today I don't know which one I will keep, which one I will withdraw, etc
 // So keep this work for later...
 
+func checkPassword(pass string) (bool, string) {
+	// Sometimes password string be found with a grep inside the binary
+	// So I want to make it more difficult to find...
+	// TO DO : of course change this password before last delivery and do not commit it !
+	// TO DO : decrypt the password here, if it has been encrypted on the vuejs side
+	if pass[0:1]=="L" && pass[1:2]=="a" && pass[2:3]=="u" && pass[3:4]=="r" && pass[4:5]=="e" && pass[5:6]=="n" && pass[6:7]=="t" {
+		return true, "Mot de passe vérifié"
+	}
+	return false, "Mot de passe incorrect"
+}
+
 func mttChassis(w http.ResponseWriter, request *http.Request) {
 	decoder := json.NewDecoder(request.Body) // create json decoder ...
 	var mttData receivedFromMTTchassis
 	var reponseData responseFromGOserver
 	
 	decoder.Decode(&mttData) // ... and receive data from the vuejs client
-
 	//fmt.Println(mttData)  KEEP it for debugging purpose
 
 	sendMail(&mttData) // this struct may become bigger, so better to pass it by address
@@ -87,20 +97,20 @@ func mttDatabaseAction(w http.ResponseWriter, request *http.Request) {
 	var reponseData responseFromGOserver
 	
 	decoder.Decode(&mttDataPassword) // ... and receive data from the vuejs client
-	// decrypt the password here, if it has been encrypted on the vuejs side		
 	//fmt.Println(mttDataPassword.Password) // KEEP it for debugging purpose
 
-	if (mttDataPassword.Password != "Laurent") { // TO DO : make a more sophisticated test, and a more sophisticated password :)
-		// bad password
-		reponseData.MessageServer = "Mot de passe incorrect"
-	} else if !nodeExists(MTT_DATABASE) {
-		 // password is ok, but the database is not available
-		reponseData.MessageServer = MTT_DATABASE + " n'existe pas sur le serveur !"
-	} else {
-		// password ok, database ok
-		// Then send the database by mail : we could send it back to vuejs by http... but with vuejs it's forbidden to access the system file
-		sendMailDatabase(MTT_DATABASE)
-		reponseData.MessageServer = MTT_DATABASE + " vous a été envoyée par mail"
+	var verif bool
+	verif, reponseData.MessageServer = checkPassword(mttDataPassword.Password)
+	if (verif) {
+		if !nodeExists(MTT_DATABASE) {
+			// password is ok, but the database is not available
+			reponseData.MessageServer = MTT_DATABASE + " n'existe pas sur le serveur !"
+		} else {
+			// password ok, database ok
+			// Then send the database by mail : we could send it back to vuejs by http... but with vuejs it's forbidden to access the system file
+			sendDatabaseByMail(MTT_DATABASE)
+			reponseData.MessageServer = MTT_DATABASE + " vous a été envoyée par mail"
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -117,21 +127,15 @@ func mttJsonAction(w http.ResponseWriter, request *http.Request) {
 
 	decoder.Decode(&mttDataJson) // ... and receive data from the vuejs client
 
-	if (mttDataJson.Password != "Laurent") { // TO DO : make a more sophisticated test, and a more sophisticated password :)
-		// bad password
-		reponseData.MessageServer = "Mot de passe incorrect"
-	} else {
+	var verif bool
+	verif, reponseData.MessageServer = checkPassword(mttDataJson.Password)
+	if (verif) {
 		jsonByteArray := [] byte(mttDataJson.Text)
-		if !json.Valid(jsonByteArray) {
-			jsonByteArray = [] byte{}			
-			reponseData.MessageServer = "Erreur de syntaxe dans le fichier json transmis"
+		if json.Valid(jsonByteArray)  && createProductsTableFromJsonContent(jsonByteArray) {
+			reponseData.MessageServer = "Succès : produits intégrés dans la base de données"
 		} else {
-			 if createProductsTableFromJsonContent(jsonByteArray) {
-				reponseData.MessageServer = "Succès : produits intégrés dans la base de données"
-			 } else {
-				reponseData.MessageServer = "Erreur de syntaxe dans le fichier json transmis"
-			 }
-	 	}
+			reponseData.MessageServer = "Erreur de syntaxe dans le fichier json transmis"			
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

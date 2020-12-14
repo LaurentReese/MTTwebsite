@@ -184,7 +184,9 @@ func displayClients(db *sql.DB) {
 	}
 }
 
-func createProductsTableFromJson(jsonName string) {
+// DEPRECATED : use createProductsTableFromJsonContent instead
+func createProductsTableFromJson(jsonName string) bool {
+// DEPRECATED : use createProductsTableFromJsonContent instead	
 	// First : read the json content and fill in a structure
 	type Product struct {
 		ProductID			string	`json:"productID"`
@@ -221,7 +223,8 @@ func createProductsTableFromJson(jsonName string) {
 
 	// we unmarshal our byteArray which contains our
 	// jsonFile's content into 'products' which we defined above
-	json.Unmarshal(byteValue, &products)
+	err = json.Unmarshal(byteValue, &products)
+	if err != nil || len(products.Products)==0 { return false }	
 
 	// 2) Write the structure content inside a table of my database ? (not mandatory)
 	// return // because maybe the json is enough to handle all that
@@ -284,6 +287,7 @@ func createProductsTableFromJson(jsonName string) {
 								products.Products[i].ProductDateAdded)
 		if err != nil { log.Panic(err) }
 	}
+	return true
 }
 
 func createProductsTableFromJsonContent(jsonByteArray [] byte) bool {
@@ -377,6 +381,6 @@ func createProductsTableFromJsonContent(jsonByteArray [] byte) bool {
 								products.Products[i].ProductDateAdded)
 		if err != nil { log.Panic(err) }
 	}
-	return true;
+	return true
 }
 

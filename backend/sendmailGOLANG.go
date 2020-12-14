@@ -58,7 +58,7 @@ func sendMail(info *receivedFromMTTchassis) {
 	fmt.Println("Email généré")
 }
 
-func sendMailDatabase(dbName string) {
+func sendDatabaseByMail(dbName string) {
 	// See https://github.com/jordan-wright/email/blob/master/README.md			
 	e := email.NewEmail()
 	e.From = "rene.lasurete@gmail.com"

@@ -11,12 +11,14 @@
       <button v-on:click="MTTDatabaseAction">
         Recevoir la database par mail
       </button>
-      <br /><br />
+      <hr />
+      <pre></pre>
+      <input type="file" ref="myFile" @change="selectedFile" />
+      <br/>            
+      <br/>                  
       <button v-on:click="MTTJsonAction">Mettre à jour les produits</button>
       <br /><br />
-      <!--MTTFileSelect v-model="file"></MTTFileSelect>
-      <p v-if="file">==> {{ file.name }}</p-->
-      <input type="file" ref="myFile" @change="selectedFile" /><br />
+      <hr />
     </span>
   </div>
 </template>
