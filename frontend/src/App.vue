@@ -2,7 +2,7 @@
   <div id="app">
     <img alt="MTT logo" src="./assets/LOGO MTT HABITAT.png" img width="5%">
     <MTTAdmin />
-    <MTTChassis msg1="Bienvenue sur le site de MÉDITERRANÉE TECHNIQUES ET TRAVAUX" msg2="Présentation des chassis de fenêtre"/>
+    <MTTChassis msg1="Bienvenue sur le site de MÉDITERRANÉE TECHNIQUES ET TRAVAUX" msg2="Présentation des chassis de fenêtre" interet="Je suis intéressé par ce produit" />
   </div>
 </template>
 
@@ -19,7 +19,8 @@ export default {
     MTTAdmin
   },
   data : function() {
-    return {}
+    return {
+    }
   }
 }
 </script>

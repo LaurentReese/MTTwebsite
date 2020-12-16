@@ -40,7 +40,6 @@ export default {
 
   data: function () {
     return {
-      // file: null,
       askPassword: false,
       password: "",
       espace: "\xa0",

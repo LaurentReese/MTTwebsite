@@ -12,7 +12,7 @@
     &nbsp;&nbsp;
     <!--label-->
     <input type="checkbox" name="chassis1" value="valeur" v-model="chassis1" />
-    Je suis intéressé par ce produit
+    {{interet}}
     <!--/label-->
     <!--pre></pre-->
     <hr />
@@ -24,7 +24,7 @@
     />
     &nbsp;&nbsp;
     <input type="checkbox" name="chassis2" value="valeur" v-model="chassis2" />
-    Je suis intéressé par ce produit
+    {{interet}}
     <hr />
     <img
       alt="FENETRES CORSE"
@@ -34,7 +34,7 @@
     />
     &nbsp;&nbsp;
     <input type="checkbox" name="chassis3" value="valeur" v-model="chassis3" />
-    Je suis intéressé par ce produit
+    {{interet}}
     <hr />
     <img
       alt="FENETRES PLIANTES 5VTX"
@@ -44,7 +44,7 @@
     />
     &nbsp;&nbsp;
     <input type="checkbox" name="chassis4" value="valeur" v-model="chassis4" />
-    Je suis intéressé par ce produit
+    {{interet}}
     <hr />
     <img
       alt="FENETRES PLIANTES 6VTX"
@@ -54,12 +54,12 @@
     />
     &nbsp;&nbsp;
     <input type="checkbox" name="chassis5" value="valeur" v-model="chassis5" />
-    Je suis intéressé par ce produit
+    {{interet}}
     <hr />
     <img alt="PLIANTES 2" src="../assets/PLIANTES 2.jpg" img width="66%" />
     &nbsp;&nbsp;
     <input type="checkbox" name="chassis6" value="valeur" v-model="chassis6" />
-    Je suis intéressé par ce produit
+    {{interet}}
     <hr />
     <video
       ref="videoFenetresAccordeon"
@@ -74,7 +74,7 @@
     <button :disabled="!isPlaying" @click="stop">Arrêter</button-->
     &nbsp;&nbsp;
     <input type="checkbox" name="chassis7" value="valeur" v-model="chassis7" />
-    Je suis intéressé par ce produit
+    {{interet}}
     <hr />
     <br />
     <b>
@@ -149,7 +149,9 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios"
+//const interet="Je suis intéressé par ce produit"
+
 //import Vue from 'vue'
 // import VeeValidate from 'vee-validate'
 /* eslint-disable */
@@ -182,6 +184,7 @@ export default {
   props: {
     msg1: String,
     msg2: String,
+    interet : String
   },
 
   methods: {
