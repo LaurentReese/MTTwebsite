@@ -11,7 +11,7 @@
     />
     &nbsp;&nbsp;
     <!--label-->
-    <input type="checkbox" name="chassis1" value="valeur" v-model="chassis1" />
+    <input type="checkbox" v-model="produits[0]" />
     {{interet}}
     <!--/label-->
     <!--pre></pre-->
@@ -23,7 +23,7 @@
       width="40%"
     />
     &nbsp;&nbsp;
-    <input type="checkbox" name="chassis2" value="valeur" v-model="chassis2" />
+    <input type="checkbox" v-model="produits[1]" />
     {{interet}}
     <hr />
     <img
@@ -33,7 +33,7 @@
       width="40%"
     />
     &nbsp;&nbsp;
-    <input type="checkbox" name="chassis3" value="valeur" v-model="chassis3" />
+    <input type="checkbox" v-model="produits[2]" />
     {{interet}}
     <hr />
     <img
@@ -43,7 +43,7 @@
       width="40%"
     />
     &nbsp;&nbsp;
-    <input type="checkbox" name="chassis4" value="valeur" v-model="chassis4" />
+    <input type="checkbox" v-model="produits[3]" />
     {{interet}}
     <hr />
     <img
@@ -53,12 +53,12 @@
       width="40%"
     />
     &nbsp;&nbsp;
-    <input type="checkbox" name="chassis5" value="valeur" v-model="chassis5" />
+    <input type="checkbox" v-model="produits[4]" />
     {{interet}}
     <hr />
     <img alt="PLIANTES 2" src="../assets/PLIANTES 2.jpg" img width="66%" />
     &nbsp;&nbsp;
-    <input type="checkbox" name="chassis6" value="valeur" v-model="chassis6" />
+    <input type="checkbox" v-model="produits[5]" />
     {{interet}}
     <hr />
     <video
@@ -73,7 +73,7 @@
     <!--button :disabled="isPlaying" @click="play">Jouer</button>
     <button :disabled="!isPlaying" @click="stop">Arrêter</button-->
     &nbsp;&nbsp;
-    <input type="checkbox" name="chassis7" value="valeur" v-model="chassis7" />
+    <input type="checkbox" v-model="produits[6]" />
     {{interet}}
     <hr />
     <br />
@@ -102,7 +102,7 @@
         v-model="addrTravaux"
         style="width:600px;"
         height="300"
-        placeholder="Ajoutez une ou plusieurs lignes"
+        v-bind:placeholder=PLACE_HOLDER
       ></textarea>
 
       <br />
@@ -114,7 +114,7 @@
         v-model="messClient"
         style="width:600px;"
         height="300"
-        placeholder="Ajoutez une ou plusieurs lignes"
+        v-bind:placeholder=PLACE_HOLDER
       ></textarea>
 
       <p v-if="errors.length">
@@ -145,9 +145,7 @@
 </template>
 
 <script>
-import axios from "axios"
-//const interet="Je suis intéressé par ce produit"
-
+import axios from "axios";
 //import Vue from 'vue'
 // import VeeValidate from 'vee-validate'
 /* eslint-disable */
@@ -157,15 +155,11 @@ export default {
 
   data: function () {
     return {
-      produits: Boolean[7],
+      PLACE_HOLDER : "Ajoutez une ou plusieurs lignes",
+      // STRANGE : I want to make it work with stuff like v-model="produits[0]"
+      // but declaring produits: Boolean[7] // does not work, I *must* use the following line instead (don't know why)
+      produits: [false, false, false, false, false, false, false],
       isPlaying: false,
-      chassis1: false, // TO DO : of course array of bool to regroup all my choices
-      chassis2: false, // TO DO : of course array of bool to regroup all my choices
-      chassis3: false, // TO DO : of course array of bool to regroup all my choices
-      chassis4: false, // TO DO : of course array of bool to regroup all my choices
-      chassis5: false, // TO DO : of course array of bool to regroup all my choices
-      chassis6: false, // TO DO : of course array of bool to regroup all my choices
-      chassis7: false, // TO DO : of course array of bool to regroup all my choices
       nom: "",
       prenom: "",
       telephone: "",
@@ -180,7 +174,7 @@ export default {
   props: {
     msg1: String,
     msg2: String,
-    interet : String
+    interet: String,
   },
 
   methods: {
@@ -192,25 +186,13 @@ export default {
     postMTTchassis: function () {
       if (!this.checkForm(this.nom, this.mail)) return;
 
-      // TO DO : take time to find the way to handle directly the array items from/to the view
-      // seems the mess from my first investigation...
-      this.produits = [
-        this.chassis1,
-        this.chassis2,
-        this.chassis3,
-        this.chassis4,
-        this.chassis5,
-        this.chassis6,
-        this.chassis7,
-      ];
-
       var dataFromMTT = {
         nom: this.nom,
         prenom: this.prenom,
         telephone: this.telephone,
         mail: this.mail,
         produits: this.produits,
-        addrTravaux: this.addrTravaux,        
+        addrTravaux: this.addrTravaux,
         messClient: this.messClient,
       };
 
@@ -240,7 +222,8 @@ export default {
       } else if (!this.validEmail(email)) {
         this.errors.push("L'email est invalide.");
       }
-      if (!this.validProducts()) this.errors.push("Vous devez sélectionner au moins un produit.");
+      if (!this.validProducts(this.produits))
+        this.errors.push("Vous devez sélectionner au moins un produit.");
       if (!this.errors.length) return true;
       return false;
     },
@@ -248,10 +231,16 @@ export default {
       var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       return re.test(email);
     },
-    validProducts : function () {
-      if (this.chassis1 || this.chassis2 || this.chassis3 || this.chassis4 || this.chassis5 || this.chassis6 || this.chassis7) return true;
-      return false; // TO DO : of course array of bool to regroup all my choices
-    }
+    validProducts: function (produits) {
+      for (var produit of produits) { // rather use the "of" keyword instead of the "in" keyword (which is deprecated.. gasp ==> the interpreter says nothing)
+        if (produit) return true;
+      }
+      return false;
+      /*      for (var i=0;i<produits.length;i++) {
+          if (produits[i]) return true;
+      }
+      return false;*/
+    },
   },
 };
 </script>

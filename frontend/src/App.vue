@@ -2,7 +2,7 @@
   <div id="app">
     <img alt="MTT logo" src="./assets/LOGO MTT HABITAT.png" img width="5%">
     <MTTAdmin />
-    <MTTChassis v-bind:msg1=MSG1 v-bind:msg2=MSG2 v-bind:interet=INTERET />
+    <MTTChassis v-bind:msg1=MSG1 v-bind:msg2=MSG2 v-bind:interet=INTERET />    
   </div>
 </template>
 
@@ -10,7 +10,6 @@
 import MTTChassis from './components/MTTChassis.vue'
 import MTTAdmin from './components/MTTAdmin.vue'
 
-//const MSG1 = "Bienvenue sur le site de MÉDITERRANÉE TECHNIQUES ET TRAVAUX"
 export default {
   name: 'App',
   components: {
