@@ -92,12 +92,12 @@
       }}{{ espace }}{{ espace }}{{ espace }}{{ espace }}
       <input type="email" v-model="mail" />
       *
+
       <br />
       <br />      
       <span>Adresse de livraison ou des travaux :</span>
       <br />
       <pre></pre>
-
       <textarea
         v-model="addrTravaux"
         style="width:600px;"
@@ -105,21 +105,17 @@
         placeholder="Ajoutez une ou plusieurs lignes"
       ></textarea>
 
-
       <br />
       <br />
       <span>Commentaire optionnel :</span>
       <br />
       <pre></pre>
-
       <textarea
         v-model="messClient"
         style="width:600px;"
         height="300"
         placeholder="Ajoutez une ou plusieurs lignes"
       ></textarea>
-
-
 
       <p v-if="errors.length">
         <b>SVP corrigez :</b>

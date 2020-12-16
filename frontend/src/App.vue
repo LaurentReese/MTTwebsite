@@ -2,7 +2,7 @@
   <div id="app">
     <img alt="MTT logo" src="./assets/LOGO MTT HABITAT.png" img width="5%">
     <MTTAdmin />
-    <MTTChassis msg1="Bienvenue sur le site de MÉDITERRANÉE TECHNIQUES ET TRAVAUX" msg2="Présentation des chassis de fenêtre" interet="Je suis intéressé par ce produit" />
+    <MTTChassis v-bind:msg1=MSG1 v-bind:msg2=MSG2 v-bind:interet=INTERET />
   </div>
 </template>
 
@@ -10,16 +10,18 @@
 import MTTChassis from './components/MTTChassis.vue'
 import MTTAdmin from './components/MTTAdmin.vue'
 
+//const MSG1 = "Bienvenue sur le site de MÉDITERRANÉE TECHNIQUES ET TRAVAUX"
 export default {
   name: 'App',
-  // TODO : stuff like const msg1 = "Bienvenue sur le site de MÉDITERRANÉE TECHNIQUES ET TRAVAUX"
-  // TODO in mounted() ?
   components: {
     MTTChassis,
     MTTAdmin
   },
   data : function() {
     return {
+      MSG1 : "Bienvenue sur le site de MÉDITERRANÉE TECHNIQUES ET TRAVAUX",
+      MSG2 : "Présentation des chassis de fenêtre",
+      INTERET : "Je suis intéressé par ce produit"
     }
   }
 }
