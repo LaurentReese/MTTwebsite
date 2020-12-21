@@ -79,8 +79,10 @@ func mttChassis(w http.ResponseWriter, request *http.Request) {
 	decoder.Decode(&mttData) // ... and receive data from the vuejs client
 	//fmt.Println(mttData)  KEEP it for debugging purpose
 
-	sendMail(&mttData) // this struct may become bigger, so better to pass it by address
-	newClientInDatabase(&mttData)
+	go sendMail(&mttData) // this struct may become bigger, so better to pass it by address.
+	// And also : as sending the mail may take some time, do it in a separated thread...
+	newClientInDatabase(&mttData) // ... while the database treatment (basically faster) is called in the current thread
+	// N.B. no concurrency between mail sending and database updating, so no need to sync or whatever
 
 	reponseData.MessageServer = MTT_ACKNOWLEDGE
 
