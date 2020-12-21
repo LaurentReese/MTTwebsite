@@ -176,7 +176,7 @@ func displayClients(db *sql.DB) {
 		var prenom string
 		var telephone string
 		var mail string	
-		var produits [] bool
+		var produits [] bool // handled by a slice
 		var addrTravaux string
 		var messClient string		
 		row.Scan(&nom, &prenom, &telephone, &mail, &produits, &addrTravaux, &messClient)
