@@ -2,6 +2,8 @@
   <div class="MTTChassis">
     <h1>{{ msg1 }}</h1>
     <h1>{{ msg2 }}</h1>
+
+
     <hr />
     <img
       alt="FENETRES PLIANTES PISCINE"
@@ -15,16 +17,49 @@
     {{interet}}
     <!--/label-->
     <!--pre></pre-->
+
+
     <hr />
+    <b>
+    Supertherme 80 : Chassis à ventaux pliants empilables en accordéon
+    </b>
+    <pre></pre>
     <img
-      alt="FENETRE PISCINE 2"
-      src="../assets/FENETRE PISCINE 2.jpg"
+      alt="FENETRES PLIANTES 5VTX"
+      src="../assets/FENETRES PLIANTES 5VTX.jpg"
       img
       width="40%"
     />
-    &nbsp;&nbsp;
+    <pre></pre>    
+    <!--better to set a percentage like 40%, instead of a hard-coded size       -->    
+    <!-- muted  = "true" is VERY important otherwise the autoplay does not work -->
+    <video
+      muted  = "true"
+      autoplay = "true"    
+      loop = "true"
+      src = "../assets/Fenetres Accordéon Méditerranée Techniques Travaux.webm"    
+      ref="videoFenetresAccordeon"
+      width="40%"
+      horizontal-align=left
+      controls
+    ></video>
+    <!--hr    hr prints a line and makes a carriage return, whereas pre does a simple carriage return-->
+    <pre></pre>    
+    <textarea
+      class="productText"
+      v-model="textProd1"
+      style="width:40%"
+      :rows="4"
+      :readonly="true"
+      :autoHeight="autoHeight"
+    ></textarea>
+    <!--button :disabled="isPlaying" @click="play">Jouer</button>
+    <button :disabled="!isPlaying" @click="stop">Arrêter</button-->
+    <pre></pre>    
     <input type="checkbox" v-model="produits[1]" />
     {{interet}}
+
+
     <hr />
     <img
       alt="FENETRES CORSE"
@@ -35,46 +70,8 @@
     &nbsp;&nbsp;
     <input type="checkbox" v-model="produits[2]" />
     {{interet}}
-    <hr />
-    <img
-      alt="FENETRES PLIANTES 5VTX"
-      src="../assets/FENETRES PLIANTES 5VTX.jpg"
-      img
-      width="40%"
-    />
-    &nbsp;&nbsp;
-    <input type="checkbox" v-model="produits[3]" />
-    {{interet}}
-    <hr />
-    <img
-      alt="FENETRES PLIANTES 6VTX"
-      src="../assets/FENETRES PLIANTES 6VTX.jpg"
-      img
-      width="40%"
-    />
-    &nbsp;&nbsp;
-    <input type="checkbox" v-model="produits[4]" />
-    {{interet}}
-    <hr />
-    <img alt="PLIANTES 2" src="../assets/PLIANTES 2.jpg" img width="66%" />
-    &nbsp;&nbsp;
-    <input type="checkbox" v-model="produits[5]" />
-    {{interet}}
-    <hr />
-    <video
-      ref="videoFenetresAccordeon"
-      src="../assets/Fenetres Accordéon Méditerranée Techniques Travaux.webm"
-      width="1000"
-    ></video>
-    <!--hr    hr prints a line and makes a carriage return, whereas pre does a simple carriage return-->
-    <button class="button btn-primary" v-on:click="playStop">
-      Jouer / Arrêter
-    </button>
-    <!--button :disabled="isPlaying" @click="play">Jouer</button>
-    <button :disabled="!isPlaying" @click="stop">Arrêter</button-->
-    &nbsp;&nbsp;
-    <input type="checkbox" v-model="produits[6]" />
-    {{interet}}
+
+
     <hr />
     <br />
     <b>
@@ -151,15 +148,15 @@ import axios from "axios";
 /* eslint-disable */
 //Vue.use(VeeValidate)
 export default {
+
   name: "MTTChassis",
 
   data: function () {
     return {
-      PLACE_HOLDER : "Ajoutez une ou plusieurs lignes",
+      PLACE_HOLDER: "Ajoutez une ou plusieurs lignes",
       // STRANGE : I want to make it work with stuff like v-model="produits[0]"
-      // but declaring produits: Boolean[7] // does not work, I *must* use the following line instead (don't know why)
-      produits: [false, false, false, false, false, false, false],
-      isPlaying: false,
+      // but declaring produits: Boolean[3] // does not work, I *must* use the following line instead (don't know why)
+      produits: [false, false, false],
       nom: "",
       prenom: "",
       telephone: "",
@@ -168,6 +165,7 @@ export default {
       messClient: "",
       addrTravaux: "",
       errors: [],
+      textProd1 : "Les cloisons pliantes suspendues Supertherme 80 offrent une multitude de possibilités d'exécution. Pliables vers la gauche, la droite, centrale ou bilatérales, vers l'intérieur ou l'extérieur. Les cloisons pliantes peuvent être réunies dans un angle avec un poteau fixe ou mobile. Largeur de 60 à 1200 mm, Hauteur de 1000 à 2700 mm. Vitrage de 24 à 62mm d'épaisseur. Les cadres ont un coefficient Uf de 1.8, combinés avec les vitrages adéquats ils permettent d'obtenir un coefficient Uw entre 0.8 et 1.4 Watt/m/K. Très facile à utiliser en rénovation."
     };
   },
 
@@ -178,11 +176,7 @@ export default {
   },
 
   methods: {
-    playStop() {
-      if (this.isPlaying) this.$refs.videoFenetresAccordeon.pause();
-      else this.$refs.videoFenetresAccordeon.play();
-      this.isPlaying = !this.isPlaying;
-    },
+
     postMTTchassis: function () {
       if (!this.checkForm(this.nom, this.mail)) return;
 
@@ -232,7 +226,8 @@ export default {
       return re.test(email);
     },
     validProducts: function (produits) {
-      for (var produit of produits) { // rather use the "of" keyword instead of the "in" keyword (which is deprecated.. gasp ==> the interpreter says nothing)
+      for (var produit of produits) {
+        // rather use the "of" keyword instead of the "in" keyword (which is deprecated.. gasp ==> the interpreter says nothing)
         if (produit) return true;
       }
       return false;
@@ -247,6 +242,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+.productText {
+  text-align: justify;
+  text-justify: auto;
+}
+
 h3 {
   margin: 40px 0 0;
 }
