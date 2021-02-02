@@ -155,6 +155,22 @@
       ></textarea>
 
       <br />
+      <br />      
+      <span>Description du projet en quelques lignes :</span>
+      <br />
+      <pre></pre>
+      <textarea
+        v-model="descProjet"
+        style="width:600px;"
+        height="300"
+        v-bind:placeholder=PLACE_HOLDER
+      ></textarea>
+
+      <pre></pre>
+      Date prévue du projet{{ espace }}{{ espace }}{{ espace }}{{ espace }}{{ espace  }}
+      <input type="date" v-model="dateProjet" />
+
+      <br />
       <br />
       <span>Commentaire optionnel :</span>
       <br />
@@ -217,6 +233,8 @@ export default {
       espace: "\xa0",
       messClient: "",
       addrTravaux: "",
+      descProjet: "",
+      dateProjet: "",      
       errors: [],
       textProd1 : "Les cloisons pliantes suspendues Supertherme 80 offrent une multitude de possibilités d'exécution. Pliables vers la gauche, la droite, centrale ou bilatérales, vers l'intérieur ou l'extérieur. Les cloisons pliantes peuvent être réunies dans un angle avec un poteau fixe ou mobile. Largeur de 60 à 1200 mm, Hauteur de 1000 à 2700 mm. Vitrage de 24 à 62mm d'épaisseur. Les cadres ont un coefficient Uf de 1.8, combinés avec les vitrages adéquats ils permettent d'obtenir un coefficient Uw entre 0.8 et 1.4 Watt/m/K. Très facile à utiliser en rénovation.",
       textProd2 : "Combine fonctionnalité et flexibilité d'une manière unique: ouverture sans limites, même autour des coins, simplement en faisant coulisser la paroi sur le rail fixé au sol. Ce système avec rupture thermique permet de faire coulisser un nombre illimité de parois et de les empiler dans un coin. Ceci peut être combiné avec une porte tournante pour les entrées de tous les jours. La possibilité de faire coulisser les parois autours des coins allant jusqu'à 90° permet une grande liberté de design. Principales caractéristiques du système: flexibilité de par l'application d'option de rotation, Système en aluminium avec rupture de pont thermique, Angles de l'élément entre 90° et 180°, Largeur de l'élément: jusqu'à 1300mm, Hauteur de l'élément: jusqu'à 2700mm, Epaisseur du verre: jusqu'à 40mm.",
@@ -243,6 +261,8 @@ export default {
         produits: this.produits,
         addrTravaux: this.addrTravaux,
         messClient: this.messClient,
+        descProjet: this.descProjet,
+        dateProjet: this.dateProjet
       };
 
       console.log(dataFromMTT);
