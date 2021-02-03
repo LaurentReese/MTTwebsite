@@ -38,7 +38,10 @@ type receivedFromMTTchassis struct {
 	Produits [] bool `json:"produits"` // a slice instead of an array !
 	AddrTravaux string `json:"addrTravaux"`		
 	MessClient string `json:"messClient"`
+	DescProjet string `json:"descProjet"`		
+	DateProjet string `json:"DateProjet"`
 }
+
 
 type receivedFromMTTchassisPassword struct {
 	Password string `json:"password"`
@@ -133,10 +136,15 @@ func mttJsonAction(w http.ResponseWriter, request *http.Request) {
 	verif, reponseData.MessageServer = checkPassword(mttDataJson.Password)
 	if (verif) {
 		jsonByteArray := [] byte(mttDataJson.Text)
-		if json.Valid(jsonByteArray)  && createProductsTableFromJsonContent(jsonByteArray) {
-			reponseData.MessageServer = "Succès : produits intégrés dans la base de données"
+		jsonOK := json.Valid(jsonByteArray)
+		if !jsonOK {
+			reponseData.MessageServer = "Erreur dans le fichier json transmis"
 		} else {
-			reponseData.MessageServer = "Erreur de syntaxe dans le fichier json transmis"			
+			if createProductsTableFromJsonContent(jsonByteArray) {
+				reponseData.MessageServer = "Succès : produits intégrés dans la base de données"
+			} else {
+				reponseData.MessageServer = "Erreur de syntaxe dans le fichier json transmis"			
+			}
 		}
 	}
 

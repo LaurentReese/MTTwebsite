@@ -50,9 +50,12 @@ func createClientTable(db *sql.DB) {
 		"mail" TEXT,
 		"addrTravaux" TEXT,
 		"messClient" TEXT,
+		"descProjet" TEXT,
+		"dateProjet" TEXT,
 		"uuid" TEXT,
 		PRIMARY KEY ("nom","mail")			
 		);` // SQL Statement for Creating a clients table (if not existing)
+		// TO DO : use the sql type DATE ?
 
 	log.Println("Création ou ouverture d'une table des clients...")
 	statement, err := db.Prepare(createClientTableSQL) // Prepare my SQL Statement
@@ -90,11 +93,11 @@ func insertClient(db *sql.DB, newClient *receivedFromMTTchassis) {
 		// 2) Update the existing record
 		log.Println("Client déjà existant...")
 		log.Println("Mise à jour du client existant...")		
-		var insertClientSQL string = `UPDATE clients SET prenom = ?, telephone = ?, addrTravaux = ?, messClient = ? WHERE nom = ? AND mail = ?` // important : PRIMARY KEY = ("nom","mail")
+		var insertClientSQL string = `UPDATE clients SET prenom = ?, telephone = ?, addrTravaux = ?, messClient = ?, descProjet = ?, dateProjet = ? WHERE nom = ? AND mail = ?` // important : PRIMARY KEY = ("nom","mail")
 		statement, err = db.Prepare(insertClientSQL) // Prepare statement.
 		// should avoid SQL injections
 		if err != nil { log.Panic(err) }
-		_, err = statement.Exec(newClient.Prenom, newClient.Telephone, newClient.AddrTravaux, newClient.MessClient, newClient.Nom, newClient.Mail) // proper code should be (*newClient).Prenom, (*newClient).Telephone ...
+		_, err = statement.Exec(newClient.Prenom, newClient.Telephone, newClient.AddrTravaux, newClient.MessClient, newClient.DescProjet, newClient.DateProjet, newClient.Nom, newClient.Mail) // proper code should be (*newClient).Prenom, (*newClient).Telephone ...
 		if err != nil { log.Panic(err) }
 		log.Println("Client existant mis à jour...")
 		// DONE: update of the client record
@@ -105,13 +108,13 @@ func insertClient(db *sql.DB, newClient *receivedFromMTTchassis) {
 		// FOR THE MOMENT I assume that this relative product number is an absolute product number
 		// The Corresp array will be filled in either using a json file or a database table
 
-		var insertClientSQL string = `INSERT INTO clients(nom, prenom, telephone, mail, addrTravaux, messClient, uuid) VALUES (?, ?, ?, ?, ?, ?, ?)`
-		// N.B. It would have liked to perform a WHERE NOT EXISTS (SELECT * FROM clients WHERE nom = ? AND mail = ? )
+		var insertClientSQL string = `INSERT INTO clients(nom, prenom, telephone, mail, addrTravaux, messClient, descProjet, dateProjet, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+		// N.B. I would have liked to perform a WHERE NOT EXISTS (SELECT * FROM clients WHERE nom = ? AND mail = ? )
 		// But (after many trials) it seems it does not work with sqlite (and/or GOLANG ?). Never mind, to make it work I've done the steps 1) and 2) just above
 		statement, err = db.Prepare(insertClientSQL) // Prepare statement.
 														// should avoid SQL injections
 		if err != nil { panic(err) }
-		_, err = statement.Exec(newClient.Nom, newClient.Prenom, newClient.Telephone, newClient.Mail, newClient.AddrTravaux, newClient.MessClient, unique_id) //, newClient.Nom, newClient.Mail) // (*newClient).Nom, (*newClient).Prenom, (*newClient).Telephone, (*newClient).Mail, (*newClient).Nom, (*newClient).Mail)
+		_, err = statement.Exec(newClient.Nom, newClient.Prenom, newClient.Telephone, newClient.Mail, newClient.AddrTravaux, newClient.MessClient, newClient.DescProjet, newClient.DateProjet, unique_id) //, newClient.Nom, newClient.Mail) // (*newClient).Nom, (*newClient).Prenom, (*newClient).Telephone, (*newClient).Mail, (*newClient).Nom, (*newClient).Mail) ...
 		if err != nil { log.Panic(err) }
 		log.Println("Nouveau client ajouté...")
 	}
@@ -178,9 +181,11 @@ func displayClients(db *sql.DB) {
 		var mail string	
 		var produits [] bool // handled by a slice.
 		var addrTravaux string
-		var messClient string		
-		row.Scan(&nom, &prenom, &telephone, &mail, &produits, &addrTravaux, &messClient)
-		log.Println("Client:", nom, prenom, telephone, mail, produits, addrTravaux, messClient)
+		var messClient string
+		var descProjet string
+		var dateProjet string
+		row.Scan(&nom, &prenom, &telephone, &mail, &produits, &addrTravaux, &messClient, &descProjet, &dateProjet)
+		log.Println("Client:", nom, prenom, telephone, mail, produits, addrTravaux, messClient, descProjet, dateProjet)
 	}
 }
 
@@ -294,10 +299,13 @@ func createProductsTableFromJsonContent(jsonByteArray [] byte) bool {
 	// First : read the json content and fill in a structure
 	type Product struct {
 		ProductID			string	`json:"productID"`
-		ProductName			string	`json:"productName"`
+		ProductPhoto		string  `json:"productPhoto"`
+		ProductName			string	`json:"productName"` 
 		ProductDescription	string	`json:"productDescription"`
+		ProductDetails		string  `json:"productDetails"`
 		ProductLink			string	`json:"productLink"`
-		ProductPrice		int 	`json:"productPrice"`
+		ProductVideo		string  `json:"productVideo"`
+		ProductPrice		string 	`json:"productPrice"`
 		ProductDelay		string	`json:"productDelay"`
 		ProductActive		bool	`json:"productActive`
 		ProductDateAdded	string	`json:"productDateAdded"`
@@ -306,7 +314,7 @@ func createProductsTableFromJsonContent(jsonByteArray [] byte) bool {
 	type Products struct {
 		JsonName		string `json:"jsonName"`
 		Version			string `json:"version"`
-		CreationDate	string `json:"creationData"`
+		CreationDate	string `json:"creationDate"`
 		LastUpdate		string `json:"lastUpdate"`
 		LastUpdater		string `json:"lastUpdater"`
 		Products []Product     `json:"products"`
@@ -318,8 +326,7 @@ func createProductsTableFromJsonContent(jsonByteArray [] byte) bool {
 	// we unmarshal our byteArray which contains our
 	// jsonFile's content into 'products' which we defined above
 	err := json.Unmarshal(jsonByteArray, &products)
-	if err != nil || len(products.Products)==0 { return false }
-
+	if err != nil || len(products.Products)==0 { panic(err); return false }
 	// 2) Write the structure content inside a table of my database ? (not mandatory)
 	// return // because maybe the json is enough to handle all that
 	// 2.1) Create database if not existing
@@ -334,15 +341,17 @@ func createProductsTableFromJsonContent(jsonByteArray [] byte) bool {
 	// 2.2) create products table if not existing
 	var createProductsTableSQL string = `CREATE TABLE IF NOT EXISTS Products (
 		"productID" TEXT,
+		"productPhoto" TEXT,		
 		"productName" TEXT,
 		"productDescription" TEXT,
+		"productDetails" TEXT,		
 		"productLink" TEXT,
-		"productPrice" SMALLINT UNSIGNED,
+		"productVideo" TEXT,				
+		"productPrice" TEXT,
 		"productDelay" TEXT,
 		"productActive" BIT,
 		"productDateAdded" TEXT
 		);` // SQL Statement to create a table of products (if not existing)
-	// NB : SMALLINT UNSIGNED can go up to 65535 : used for a price
 	// NB : BIT can be 0 (false) or 1 (true)
 	statement, err := sqliteDatabase.Prepare(createProductsTableSQL) // Prepare my SQL Statement
 	if err != nil {	panic(err) }
@@ -358,23 +367,29 @@ func createProductsTableFromJsonContent(jsonByteArray [] byte) bool {
 	// 2.4) Now insert the products in the database
 	var insertProductsSQL string = `INSERT INTO Products(
 		productID,
+		productPhoto,		
 		productName,
 		productDescription,
+		productDetails,		
 		productLink,
+		productVideo,				
 		productPrice,
 		productDelay,
 		productActive,
 		productDateAdded)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	statement, err = sqliteDatabase.Prepare(insertProductsSQL) // Prepare statement.
 	if err != nil { log.Panic(err) }
 	var b uint8
 	for i:=0; i<len(products.Products); i++ {
 		if (products.Products[i].ProductActive) {b=1} else {b=0}
 		_, err = statement.Exec(products.Products[i].ProductID,
+								products.Products[i].ProductPhoto,
 								products.Products[i].ProductName,
 								products.Products[i].ProductDescription,
+								products.Products[i].ProductDetails,								
 								products.Products[i].ProductLink,
+								products.Products[i].ProductVideo,								
 								products.Products[i].ProductPrice,
 								products.Products[i].ProductDelay,
 								b, // products.Products[i].ProductActive
