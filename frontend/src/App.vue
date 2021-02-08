@@ -2,7 +2,7 @@
   <div id="app">
     <img alt="MTT logo" src="./assets/LOGO MTT HABITAT.png" img width="5%">
     <MTTAdmin />
-    <MTTChassis v-bind:msg1=MSG1 v-bind:msg2=MSG2 v-bind:interet=INTERET />    
+    <MTTChassis v-bind:msg1=MSG1 v-bind:msg2=MSG2 v-bind:interet=INTERET />
   </div>
 </template>
 
@@ -22,7 +22,8 @@ export default {
       MSG2 : "Présentation des chassis de fenêtre",
       INTERET : "Je suis intéressé par ce produit"
     }
-  }
+  },
+
 }
 </script>
 

@@ -10,6 +10,7 @@ import (
 )
 
 func sendMail(info *receivedFromMTTchassis) {
+	if info.Comment != "" {return}
 	// Sender data.
 	from := "rene.lasurete@gmail.com" // old useless account that I don't care about
 	password := "d<5@M48c6UyDz]" // password is here in clear but I don't care as it's an old useless account
@@ -44,7 +45,6 @@ func sendMail(info *receivedFromMTTchassis) {
 	if info.MessClient != "" { messageString += "Message Client :" + "\r\n" + info.MessClient + "\r\n\r\n"}
 	if info.DescProjet != "" { messageString += "Description Projet :" + "\r\n" + info.DescProjet + "\r\n\r\n"}
 	if info.DateProjet != "" { messageString += "Date Projet :" + "\r\n" + info.DateProjet + "\r\n"}
-
 
 	//fmt.Println(messageString)
 	message := [] byte (messageString)	// fmt.Println(message) would give only numbers

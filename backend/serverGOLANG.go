@@ -39,7 +39,8 @@ type receivedFromMTTchassis struct {
 	AddrTravaux string `json:"addrTravaux"`		
 	MessClient string `json:"messClient"`
 	DescProjet string `json:"descProjet"`		
-	DateProjet string `json:"DateProjet"`
+	DateProjet string `json:"dateProjet"`
+	Comment string `json:"comment"`
 }
 
 
@@ -80,6 +81,7 @@ func mttChassis(w http.ResponseWriter, request *http.Request) {
 	var reponseData responseFromGOserver
 	
 	decoder.Decode(&mttData) // ... and receive data from the vuejs client
+	if mttData.Comment != "" { return }
 	//fmt.Println(mttData)  KEEP it for debugging purpose
 
 	go sendMail(&mttData) // this struct may become bigger, so better to pass it by address.

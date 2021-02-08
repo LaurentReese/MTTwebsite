@@ -204,8 +204,8 @@
         </button>
       </h1>
     </b>
-    <pre></pre>
-    <pre></pre>
+    <pre></pre>    
+    <input class="comment" type="text" v-model="comment"/>
   </div>
 </template>
 
@@ -235,6 +235,7 @@ export default {
       addrTravaux: "",
       descProjet: "",
       dateProjet: "",      
+      commment : "",      
       errors: [],
       textProd1 : "Les cloisons pliantes suspendues Supertherme 80 offrent une multitude de possibilités d'exécution. Pliables vers la gauche, la droite, centrale ou bilatérales, vers l'intérieur ou l'extérieur. Les cloisons pliantes peuvent être réunies dans un angle avec un poteau fixe ou mobile. Largeur de 60 à 1200 mm, Hauteur de 1000 à 2700 mm. Vitrage de 24 à 62mm d'épaisseur. Les cadres ont un coefficient Uf de 1.8, combinés avec les vitrages adéquats ils permettent d'obtenir un coefficient Uw entre 0.8 et 1.4 Watt/m/K. Très facile à utiliser en rénovation.",
       textProd2 : "Combine fonctionnalité et flexibilité d'une manière unique: ouverture sans limites, même autour des coins, simplement en faisant coulisser la paroi sur le rail fixé au sol. Ce système avec rupture thermique permet de faire coulisser un nombre illimité de parois et de les empiler dans un coin. Ceci peut être combiné avec une porte tournante pour les entrées de tous les jours. La possibilité de faire coulisser les parois autours des coins allant jusqu'à 90° permet une grande liberté de design. Principales caractéristiques du système: flexibilité de par l'application d'option de rotation, Système en aluminium avec rupture de pont thermique, Angles de l'élément entre 90° et 180°, Largeur de l'élément: jusqu'à 1300mm, Hauteur de l'élément: jusqu'à 2700mm, Epaisseur du verre: jusqu'à 40mm.",
@@ -262,7 +263,8 @@ export default {
         addrTravaux: this.addrTravaux,
         messClient: this.messClient,
         descProjet: this.descProjet,
-        dateProjet: this.dateProjet
+        dateProjet: this.dateProjet,
+        comment: this.comment
       };
 
       console.log(dataFromMTT);
@@ -323,6 +325,7 @@ export default {
   text-justify: auto;
 }
 
+
 h3 {
   margin: 40px 0 0;
 }
@@ -338,31 +341,46 @@ a {
   color: #42b983;
 }
 
-
 hr {
 	border-top: 5px double #8c8b8b;
   border-style: solid; 
 }
 
-/*
-hr { 
-  height: 30px; 
-  border-style: solid; 
-  border-color: #8c8b8b; 
-  border-width: 1px 0 0 0; 
-  border-radius: 20px; 
-} 
-hr:before { 
-  display: block; 
-  content: ""; 
-  height: 30px; 
-  margin-top: -31px; 
-  border-style: solid; 
-  border-color: #8c8b8b; 
-  border-width: 0 0 1px 0; 
-  border-radius: 20px; 
-}
-*/
-
+.comment {
+  color : transparent;
+  background-color: transparent;
+  text-emphasis-color: transparent;
+  text-decoration-color: transparent;
+  stop-color:transparent;
+  flood-color:transparent;
+  color-adjust: transparent;
+  lighting-color: transparent;
+  caret-color: transparent;
+  scrollbar-highlight-color: transparent;
+  text-emphasis-color: transparent;
+  scrollbar-base-color: transparent;
+  scrollbar-face-color: transparent;
+  scrollbar-darkshadow-color: transparent;
+  scrollbar-3dlight-color: transparent;
+  scrollbar-track-color: transparent;
+  scrollbar-arrow-color: transparent;
+  outline-color: transparent;
+  border-inline-end-color: transparent;
+  border-inline-start-color: transparent;
+  border-block-start-color: transparent;
+  border-block-end-color: transparent;
+  border-color: transparent;  
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-block-color: transparent;
+  border-inline-color: transparent;  
+  margin: none;
+  padding: none;
+  border: none;
+  border-width : 0;
+  outline: none;
+  }
 
 </style>
