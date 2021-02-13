@@ -5,7 +5,7 @@
 
     <hr />
     <b>
-    Monoslide/Chassis à ouverture totale : Ventaux aluminium à rupture de pont thermique, coulissant séparement sur toute la longueur d'un rail unique, et empilables dans une zone de stockage
+    Monoslide/Chassis à ouverture totale : Vantaux aluminium à rupture de pont thermique, coulissant séparement sur toute la longueur d'un rail unique, et empilables dans une zone de stockage
     </b>
     <pre></pre>      
     Prix : sur devis
@@ -16,7 +16,7 @@
       alt="FENETRES PLIANTES PISCINE"
       src="../assets/FENETRES PLIANTES PISCINE.jpg"
       img
-      width="40%"
+      :width="percent"
     />
     <pre></pre>       
     <video
@@ -25,7 +25,7 @@
       loop = "true"
       src = "../assets/Fenetres Empilables Mediterranee Techniques Travaux.webm"    
       ref="videoFenetresEmpilables"
-      width="40%"
+      :width="percent"
       horizontal-align=left
       controls
     ></video>
@@ -33,7 +33,7 @@
     <textarea
       class="productText"
       v-model="textProd2"
-      style="width:40%"
+      :style="myStyle"
       :rows="4"
       :readonly="true"
       :autoHeight="autoHeight"
@@ -47,7 +47,7 @@
 
     <hr />
     <b>
-    Supertherme 80 : Chassis à ventaux pliants empilables en accordéon
+    Supertherme 80 : Chassis à vantaux pliants empilables en accordéon
     </b>
     <pre></pre>              
     Prix : 700 Euros/m2
@@ -58,7 +58,7 @@
       alt="FENETRES PLIANTES 5VTX"
       src="../assets/FENETRES PLIANTES 5VTX.jpg"
       img
-      width="40%"
+      :width="percent"
     />
     <pre></pre>    
     <!--better to set a percentage like 40%, instead of a hard-coded size       -->    
@@ -69,7 +69,7 @@
       loop = "true"
       src = "../assets/Fenetres Accordéon Méditerranée Techniques Travaux.webm"    
       ref="videoFenetresAccordeon"
-      width="40%"
+      :width="percent"
       horizontal-align=left
       controls
     ></video>
@@ -78,7 +78,7 @@
     <textarea
       class="productText"
       v-model="textProd1"
-      style="width:40%"
+      :style="myStyle"
       :rows="4"
       :readonly="true"
       :autoHeight="autoHeight"
@@ -95,7 +95,7 @@
 
     <hr />
     <b>
-    Bali 60 : Panneau coulissant suspendu
+    Bali 60/ThermoSlide 77 : Panneau coulissant suspendu
     </b>
     <pre></pre>      
     Prix : 700 Euros/m2
@@ -104,21 +104,21 @@
     <pre></pre>       
     <img
       alt="FENETRES CORSE"
-      src="../assets/FENETRES CORSE.jpg"
+      src="../assets/11_Image_bali-60.jpg"
       img
-      width="40%"
+      :width="percent"
     />
     <pre></pre>    
     <textarea
       class="productText"
       v-model="textProd3"
-      style="width:40%"
+      :style="myStyle"
       :rows="4"
       :readonly="true"
       :autoHeight="autoHeight"
     ></textarea>    
     <pre></pre>
-    <a href="https://www.archiexpo.fr/prod/sunparadise/product-62746-569452.html">{{VOIR_AUSSI}}</a>
+    <a href="https://www.sunparadise.com/EN/Int/Consumer-Product-Detail/SLIDING-SYSTEMS/BALI-60/0/3/11">{{VOIR_AUSSI}}</a>
     <pre></pre>   
     <input type="checkbox" v-model="produits[2]" />
     {{interet}}
@@ -149,7 +149,7 @@
       <pre></pre>
       <textarea
         v-model="addrTravaux"
-        style="width:600px;"
+         :style="myStyle"
         height="300"
         v-bind:placeholder=PLACE_HOLDER
       ></textarea>
@@ -161,7 +161,7 @@
       <pre></pre>
       <textarea
         v-model="descProjet"
-        style="width:600px;"
+        :style="myStyle"
         height="300"
         v-bind:placeholder=PLACE_HOLDER
       ></textarea>
@@ -177,7 +177,7 @@
       <pre></pre>
       <textarea
         v-model="messClient"
-        style="width:600px;"
+        :style="myStyle"
         height="300"
         v-bind:placeholder=PLACE_HOLDER
       ></textarea>
@@ -215,14 +215,20 @@ import axios from "axios";
 // import VeeValidate from 'vee-validate'
 /* eslint-disable */
 //Vue.use(VeeValidate)
+
 export default {
+  mounted : function() {
+    this.myStyle = "width:" + this.percent // cannot do that at declaration time
+  },
 
   name: "MTTChassis",
 
   data: function () {
     return {
-      PLACE_HOLDER: "Ajoutez une ou plusieurs lignes",
-      VOIR_AUSSI : "Voir Aussi...",      
+      percent : "100%",
+      myStyle : "", // will be initialized at "mounted time" by using the percent variable
+      PLACE_HOLDER : "Ajoutez une ou plusieurs lignes",
+      VOIR_AUSSI : "Voir Aussi...",
       // STRANGE : I want to make it work with stuff like v-model="produits[0]"
       // but declaring produits: Boolean[3] // does not work, I *must* use the following line instead (don't know why)
       produits: [false, false, false],
@@ -238,8 +244,8 @@ export default {
       commment : "",      
       errors: [],
       textProd1 : "Les cloisons pliantes suspendues Supertherme 80 offrent une multitude de possibilités d'exécution. Pliables vers la gauche, la droite, centrale ou bilatérales, vers l'intérieur ou l'extérieur. Les cloisons pliantes peuvent être réunies dans un angle avec un poteau fixe ou mobile. Largeur de 60 à 1200 mm, Hauteur de 1000 à 2700 mm. Vitrage de 24 à 62mm d'épaisseur. Les cadres ont un coefficient Uf de 1.8, combinés avec les vitrages adéquats ils permettent d'obtenir un coefficient Uw entre 0.8 et 1.4 Watt/m/K. Très facile à utiliser en rénovation.",
-      textProd2 : "Combine fonctionnalité et flexibilité d'une manière unique: ouverture sans limites, même autour des coins, simplement en faisant coulisser la paroi sur le rail fixé au sol. Ce système avec rupture thermique permet de faire coulisser un nombre illimité de parois et de les empiler dans un coin. Ceci peut être combiné avec une porte tournante pour les entrées de tous les jours. La possibilité de faire coulisser les parois autours des coins allant jusqu'à 90° permet une grande liberté de design. Principales caractéristiques du système: flexibilité de par l'application d'option de rotation, Système en aluminium avec rupture de pont thermique, Angles de l'élément entre 90° et 180°, Largeur de l'élément: jusqu'à 1300mm, Hauteur de l'élément: jusqu'à 2700mm, Epaisseur du verre: jusqu'à 40mm.",
-      textProd3 : "Porte coulissante suspendue sur un à trois rails. Les éléments se soulèvent de 6mm par rotation manuelle de 180° de la poignée à levier. Les joints en caoutchouc sont ainsi libérés et l'élément peut coulisser facilement. Vitrage de 16 à 42mm. Dimensions des ventaux : largeur max = 2500mm, hauteur max = 2800 mm."
+      textProd2 : "Combine fonctionnalité et flexibilité d'une manière unique: ouverture sans limites, même autour des coins, simplement en faisant coulisser la paroi sur le rail fixe au sol. Ce système avec rupture thermique permet de faire coulisser un nombre illimité de parois et de les empiler dans un coin. Ceci peut être combiné avec une porte ouvrante pour les entrées de tous les jours. La possibilité de faire coulisser les parois autour des coins allant jusqu'à 90° permet une grande liberté de design. Principales caractéristiques du système: flexibilité de par l'application d'option de rotation, Système en aluminium avec rupture de pont thermique, Angles de l'élément entre 90° et 180°, Largeur de l'élément: jusqu'à 1300mm, Hauteur de l'élément: jusqu'à 2700mm, Epaisseur du verre: jusqu'à 40mm.",
+      textProd3 : "Porte coulissante suspendue sur un à trois rails, à haut rendement thermique et phonique. Les éléments se soulèvent de 6mm par rotation manuelle de 180° de la poignée à levier. Les joints en caoutchouc sont ainsi libérés et l'élément peut coulisser facilement. Vitrage de 16 à 42mm. Dimensions des vantaux : largeur max = 2500 mm, hauteur max = 2800 mm."
     };
   },
 
@@ -250,7 +256,6 @@ export default {
   },
 
   methods: {
-
     postMTTchassis: function () {
       if (!this.checkForm(this.nom, this.mail)) return;
 
@@ -320,11 +325,12 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
+body {background-color: #b2b2b2;}
+
 .productText {
   text-align: justify;
   text-justify: auto;
 }
-
 
 h3 {
   margin: 40px 0 0;
@@ -337,6 +343,8 @@ li {
   display: inline-block;
   margin: 0 10px;
 }
+
+
 a {
   color: #42b983;
 }

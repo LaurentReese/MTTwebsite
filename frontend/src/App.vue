@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <img alt="MTT logo" src="./assets/LOGO MTT HABITAT.png" img width="5%">
+    <img alt="MTT logo" src="./assets/LOGO MTT HABITAT.png" img width="20%">
     <MTTAdmin />
     <MTTChassis v-bind:msg1=MSG1 v-bind:msg2=MSG2 v-bind:interet=INTERET />
   </div>
@@ -18,8 +18,8 @@ export default {
   },
   data : function() {
     return {
-      MSG1 : "Bienvenue sur le site de MÉDITERRANÉE TECHNIQUES ET TRAVAUX",
-      MSG2 : "Présentation des chassis de fenêtre",
+      MSG1 : "Bienvenue sur le site de MTT HABITAT",
+      MSG2 : "Nous présentons des solutions spéciales de système à ouverture totale. De conception suédoise, ces produits sont de haute qualité et offrent de grandes performances d'isolations thermique et phonique.",
       INTERET : "Je suis intéressé par ce produit"
     }
   },
@@ -29,6 +29,7 @@ export default {
 
 <style>
 #app {
+  background-color: #e4e4e4;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
