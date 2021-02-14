@@ -33,7 +33,7 @@
     <textarea
       class="productText"
       v-model="textProd2"
-      :style="myStyle"
+      style="width:99%"
       :rows="4"
       :readonly="true"
       :autoHeight="autoHeight"
@@ -78,7 +78,7 @@
     <textarea
       class="productText"
       v-model="textProd1"
-      :style="myStyle"
+      style="width:99%"
       :rows="4"
       :readonly="true"
       :autoHeight="autoHeight"
@@ -103,7 +103,7 @@
     Délai de livraison : 6 à 8 semaines
     <pre></pre>       
     <img
-      alt="FENETRES CORSE"
+      alt="11_Image_bali-60"
       src="../assets/11_Image_bali-60.jpg"
       img
       :width="percent"
@@ -112,7 +112,7 @@
     <textarea
       class="productText"
       v-model="textProd3"
-      :style="myStyle"
+      style="width:99%"
       :rows="4"
       :readonly="true"
       :autoHeight="autoHeight"
@@ -149,7 +149,7 @@
       <pre></pre>
       <textarea
         v-model="addrTravaux"
-         :style="myStyle"
+        style="width:99%"
         height="300"
         v-bind:placeholder=PLACE_HOLDER
       ></textarea>
@@ -161,7 +161,7 @@
       <pre></pre>
       <textarea
         v-model="descProjet"
-        :style="myStyle"
+        style="width:99%"
         height="300"
         v-bind:placeholder=PLACE_HOLDER
       ></textarea>
@@ -177,7 +177,7 @@
       <pre></pre>
       <textarea
         v-model="messClient"
-        :style="myStyle"
+        style="width:99%"
         height="300"
         v-bind:placeholder=PLACE_HOLDER
       ></textarea>
@@ -225,7 +225,8 @@ export default {
 
   data: function () {
     return {
-      percent : "100%",
+      percent : "100%", // change it to cascade change all
+      // use myStyle with something like :style="myStyle" if necessary
       myStyle : "", // will be initialized at "mounted time" by using the percent variable
       PLACE_HOLDER : "Ajoutez une ou plusieurs lignes",
       VOIR_AUSSI : "Voir Aussi...",
@@ -324,8 +325,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
-body {background-color: #b2b2b2;}
 
 .productText {
   text-align: justify;
