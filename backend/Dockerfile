@@ -1,3 +1,4 @@
+# tuto : https://tutorialedge.net/golang/go-docker-tutorial/#why-docker
 ## We specify the base image we need for our
 ## go application
 ## FROM golang:1.13.15 is the golang docker version
@@ -25,3 +26,15 @@ RUN go build serverGOLANG.go sendmailGOLANG.go databaseGOLANG.go
 ## Our start command which kicks off
 ## our newly created binary executable
 CMD ["/app/serverGOLANG"]
+
+# from the directory where Dockerfile is, run the command :
+# ==> sudo docker build . -t mtt_backend
+# see the results :
+# ==> sudo docker images
+# run it 
+# ==> sudo docker run -p 8090:8090 -it mtt_backend
+# delete a docker image
+# ==> sudo docker rmi mtt_backend
+# purge
+# ==> sudo docker images purge
+
