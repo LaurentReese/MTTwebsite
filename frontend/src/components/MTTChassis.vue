@@ -109,6 +109,17 @@
       :width="percent"
     />
     <pre></pre>    
+    <video
+      muted  = "true"
+      autoplay = "true"    
+      loop = "true"
+      src = "../assets/sunparadise-monoslide.mp4"    
+      ref="sunparadise-monoslide"
+      :width="percent"
+      horizontal-align=left
+      controls
+    ></video>
+    <pre></pre>    
     <textarea
       class="productText"
       v-model="textProd3"
