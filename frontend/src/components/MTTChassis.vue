@@ -288,7 +288,9 @@ export default {
 
       axios({
         method: "POST",
-        url: "http://127.0.0.1:8090/mttChassis",
+        url: "http://127.0.0.1:8090/mttChassis",   
+        //url: "http://golang.backend.mtt-habitat.laurentreese.node.intern:8090/mttChassis",           
+        //url: "http://golang.backend.mtt-habitat:8090/mttChassis",                   
         data: dataFromMTT,
         headers: { "content-type": "text/plain" },
       })

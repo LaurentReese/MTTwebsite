@@ -23,18 +23,28 @@ RUN go get modernc.org/sqlite
 ## we run go build to compile the binary
 ## executable of our Go program
 RUN go build serverGOLANG.go sendmailGOLANG.go databaseGOLANG.go 
+
+EXPOSE 8090
 ## Our start command which kicks off
 ## our newly created binary executable
 CMD ["/app/serverGOLANG"]
 
 # from the directory where Dockerfile is, run the command :
-# ==> sudo docker build . -t mtt_backend
+# ==> docker build . -t mtt-backend
 # see the results :
-# ==> sudo docker images
+# ==> docker images
 # run it 
-# ==> sudo docker run -p 8090:8090 -it mtt_backend
-# delete a docker image
-# ==> sudo docker rmi mtt_backend
+# ==> docker run -p 8090:8090 -it mtt-backend
+# delete a docker image (add --force to force)
+# ==> docker rmi mtt-backend
 # purge
-# ==> sudo docker images purge
+# ==> docker images purge
+#
+# To build a distant image (will go to Docker Hub, 32681733 is my Docker Hub ID)
+# ==> docker build . -t 32681733/mtt-backend
+# To test locally the distant Docker image
+# ==> docker run -it -p 8090:8090 -m 1536m --memory-swap=1536m 32681733/mtt-backend
+# To push the image to Docker Hub (32681733 is my Docker Hub ID)
+# ==> docker push 32681733/mtt-backend
+
 

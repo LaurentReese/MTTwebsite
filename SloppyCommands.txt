@@ -1,0 +1,16 @@
+# Once the images are on the Docker Hub:
+# Check the mtt-sloppy.json file
+# Then,
+
+# 1) To start the images (frontend and backend, see mtt-sloppy.json)
+sloppy start --var=domain:mtt-habitat.sloppy.zone mtt-sloppy.json
+
+# 2) If new images to build, then delete the old ones (can by done on the sloppy site as well)
+sloppy delete mtt-habitat
+
+# 3) To verify it's running ok
+sloppy show
+sloppy show mtt-habitat
+
+# vuejs.frontend.mtt-habitat.laurentreese.node.intern is the frontend FQDN (Full Qualified Domain Name)
+# golang.backend.mtt-habitat.laurentreese.node.intern is the backend FQDN (Full Qualified Domain Name)

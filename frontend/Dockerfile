@@ -26,13 +26,23 @@ EXPOSE 8080
 CMD [ "http-server", "dist" ]
 
 # Now let's build the Docker image of our Vue.js app:
-# ==> sudo docker build . -t mtt_frontend
-# OLD ==> docker build -t vuejs-cookbook/dockerize-vuejs-app .
+# ==> docker build . -t mtt-frontend
+# see the results :
+# ==> docker images
 # Finally, let's run our Vue.js app in a Docker container:
-# ==> docker run -p 8080:8080 -it mtt_frontend
-# OLD ==> docker run -it -p 8080:8080 --rm --name dockerize-vuejs-app-1 vuejs-cookbook/dockerize-vuejs-app
-# We should be able to access our Vue.js app on localhost:8080.
-# delete a docker image
-# ==> sudo docker rmi mtt_backend
+# ==> docker run -p 8080:8080 -it mtt-frontend
+# delete a docker image (add --force to force)
+# ==> docker rmi mtt-frontend
 # purge
-# ==> sudo docker images purge
+# ==> docker images purge
+#
+# To build a distant image (will go to Docker Hub, 32681733 is my Docker Hub ID)
+# ==> docker build . -t 32681733/mtt-frontend
+# To test locally the distant Docker image
+# ==> docker run -it -p 8080:8080 -m 512m --memory-swap=512m 32681733/mtt-frontend
+# To push the image to Docker Hub (32681733 is my Docker Hub ID)
+# ==> docker push 32681733/mtt-frontend
+
+
+
+
