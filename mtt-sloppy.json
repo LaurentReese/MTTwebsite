@@ -1,52 +1,65 @@
 {
     "project": "mtt-habitat",
     "services": [
-        {
-            "id": "frontend",
-            "apps": [
-                {
-                    "id": "vuejs",
-                    "domain": {
-                        "uri": "$domain"
-                    },
-                    "mem": 512,
-                    "image": "32681733/mtt-frontend",
-                    "instances": 1,
-                    "port_mappings": [
-                        {
-                            "container_port": 8080
-                        }
-                    ],
-                    "env": {
-                        "MESSAGE": "sloppy.io rulez!"
-                    }
-                }
-            ]
-        },
-        {
-            "id": "backend",
-            "apps": [
-                {
-                    "id": "golang",
-                    "image": "32681733/mtt-backend",
-                    "instances": 1,
-                    "port_mappings": [
-                        {
-                            "container_port": 8090
-                        }
-                    ],
-                    "mem": 1536,
-                    "ssl": false,
-                    "volumes": [
-                        {
-                            "container_path": "/data/db",
-                            "size": "8GB"
-                        }
-                    ],
-                    "health_checks": [],
-                    "logging": null
-                }
-            ]
-        }
+      {
+        "id": "frontend",
+        "apps": [
+          {
+            "id": "vuejs",
+            "image": "32681733/mtt-frontend",
+            "instances": 1,
+            "mem": 512,
+            "domain": {
+              "uri": "mtt-habitat.sloppy.zone"
+            },
+            "ssl": false,
+            "port_mappings": [
+              {
+                "container_port": 8080
+              }
+            ],
+            "env": {
+              "MTT_EXECUTION": "PRODUCTION"
+            },
+            "volumes": [
+            ],
+            "health_checks": [
+            ],
+            "logging": null
+          }
+        ]
+      },
+      {
+        "id": "backend",
+        "apps": [
+          {
+            "id": "golang",
+            "image": "32681733/mtt-backend",
+            "instances": 1,
+            "mem": 1536,
+            "domain": {
+              "uri": "mtt-backend.sloppy.zone"
+            },
+            "ssl": false,
+            "port_mappings": [
+              {
+                "container_port": 80
+              }
+            ],
+            "env": {
+              "MTT_EXECUTION": "PRODUCTION"
+            },
+            "volumes": [
+              {
+                "container_path": "/data/db",
+                "size": "8GB"
+              }
+            ],
+            "health_checks": [
+            ],
+            "logging": null
+          }
+        ]
+      }
     ]
-}
+  }

@@ -22,7 +22,9 @@ COPY . .
 # construit l'app pour la production en la minifiant
 RUN npm run build
 
+ # same ports for local or production execution
 EXPOSE 8080
+
 CMD [ "http-server", "dist" ]
 
 # Now let's build the Docker image of our Vue.js app:

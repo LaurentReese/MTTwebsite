@@ -170,6 +170,7 @@ func main() {
 //	return
 	http.HandleFunc("/mttJsonAction", mttJsonAction)
 	http.HandleFunc("/mttChassis", mttChassis)
-	http.HandleFunc("/mttDatabaseAction", mttDatabaseAction)	
-	http.ListenAndServe(":8090", nil)
+	http.HandleFunc("/mttDatabaseAction", mttDatabaseAction)
+	//http.ListenAndServe(":8090", nil)	// local
+	http.ListenAndServe(":80", nil)		// production
 }

@@ -288,10 +288,8 @@ export default {
 
       axios({
         method: "POST",
-// https://medium.com/js-dojo/how-to-use-environment-variables-in-vue-js-273eba0102b0 !!
-        url: "http://127.0.0.1:8090/mttChassis",   
-        //url: "http://golang.backend.mtt-habitat.laurentreese.node.intern:8090/mttChassis",           
-        //url: "http://golang.backend.mtt-habitat:8090/mttChassis",                   
+        // url: "http://127.0.0.1:8090/mttChassis",   // local
+        url: "http://mtt-backend.sloppy.zone:80/mttChassis", // production
         data: dataFromMTT,
         headers: { "content-type": "text/plain" },
       })

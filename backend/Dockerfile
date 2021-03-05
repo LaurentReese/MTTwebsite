@@ -24,7 +24,9 @@ RUN go get modernc.org/sqlite
 ## executable of our Go program
 RUN go build serverGOLANG.go sendmailGOLANG.go databaseGOLANG.go 
 
-EXPOSE 8090
+# EXPOSE 80 is necessary for production, but does nothing in local
+EXPOSE 80
+
 ## Our start command which kicks off
 ## our newly created binary executable
 CMD ["/app/serverGOLANG"]

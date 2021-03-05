@@ -81,7 +81,8 @@ export default {
       };
       axios({
         method: "POST",
-        url: "http://127.0.0.1:8090/mttDatabaseAction",
+        // url: "http://127.0.0.1:8090/mttDatabaseAction", // local
+        url: "http://mtt-backend.sloppy.zone:80/mttDatabaseAction", // production        
         data: dataFromMTTPassword,
         headers: { "content-type": "text/plain" },
       })
@@ -112,7 +113,8 @@ export default {
       };
       axios({
         method: "POST",
-        url: "http://127.0.0.1:8090/mttJsonAction",
+        // url: "http://127.0.0.1:8090/mttJsonAction", // local
+        url: "http://mtt-backend.sloppy.zone:80/mttJsonAction", // production                
         data: dataFromMTTJson,
         headers: { "content-type": "text/plain" },
       })
