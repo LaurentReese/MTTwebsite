@@ -171,6 +171,10 @@ func main() {
 	http.HandleFunc("/mttJsonAction", mttJsonAction)
 	http.HandleFunc("/mttChassis", mttChassis)
 	http.HandleFunc("/mttDatabaseAction", mttDatabaseAction)
-	//http.ListenAndServe(":8090", nil)	// local
-	http.ListenAndServe(":80", nil)		// production
+	if os.Getenv("MTT_EXECUTION")=="PRODUCTION" {
+		http.ListenAndServe(":80", nil)		// production
+	} else {
+		http.ListenAndServe(":8090", nil)	// local
+	}
+
 }
