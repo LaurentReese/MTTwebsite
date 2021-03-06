@@ -18,9 +18,6 @@
                 "container_port": 8080
               }
             ],
-            "env": {
-              "MTT_EXECUTION": "PRODUCTION"
-            },
             "volumes": [
             ],
             "health_checks": [

@@ -79,10 +79,17 @@ export default {
       var dataFromMTTPassword = {
         password: this.password,
       };
+      //url: "http://127.0.0.1:8090/mttChassis",   // local
+      //url: "http://mtt-backend.sloppy.zone:80/mttChassis", // production
+      // TO DO : factorize VUE_APP_EXECUTION from App.vue
+      var myUrl = "http://127.0.0.1:8090/mttChassis";
+      if (process.env.VUE_APP_EXECUTION == "PRODUCTION") {
+        myUrl = "http://mtt-backend.sloppy.zone:80/mttChassis";
+      }
+
       axios({
         method: "POST",
-        // url: "http://127.0.0.1:8090/mttDatabaseAction", // local
-        url: "http://mtt-backend.sloppy.zone:80/mttDatabaseAction", // production        
+        url: myUrl,
         data: dataFromMTTPassword,
         headers: { "content-type": "text/plain" },
       })
@@ -111,10 +118,17 @@ export default {
         password: this.password,
         text: this.text,
       };
+      //url: "http://127.0.0.1:8090/mttChassis",   // local
+      //url: "http://mtt-backend.sloppy.zone:80/mttChassis", // production
+      // TO DO : factorize VUE_APP_EXECUTION from App.vue
+      var myUrl = "http://127.0.0.1:8090/mttChassis";
+      if (process.env.VUE_APP_EXECUTION == "PRODUCTION") {
+        myUrl = "http://mtt-backend.sloppy.zone:80/mttChassis";
+      }
+
       axios({
         method: "POST",
-        // url: "http://127.0.0.1:8090/mttJsonAction", // local
-        url: "http://mtt-backend.sloppy.zone:80/mttJsonAction", // production                
+        url: myUrl,
         data: dataFromMTTJson,
         headers: { "content-type": "text/plain" },
       })

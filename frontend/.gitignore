@@ -5,7 +5,8 @@ node_modules
 
 # local env files
 .env.local
-.env.*.local
+.env.development.local
+# I Intentionally let the file .env.production.local being saved
 
 # Log files
 npm-debug.log*

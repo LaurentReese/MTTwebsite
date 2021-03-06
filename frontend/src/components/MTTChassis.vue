@@ -228,19 +228,19 @@ import axios from "axios";
 //Vue.use(VeeValidate)
 
 export default {
-  mounted : function() {
-    this.myStyle = "width:" + this.percent // cannot do that at declaration time
+  mounted: function () {
+    this.myStyle = "width:" + this.percent; // cannot do that at declaration time
   },
 
   name: "MTTChassis",
 
   data: function () {
     return {
-      percent : "100%", // change it to cascade change all
+      percent: "100%", // change it to cascade change all
       // use myStyle with something like :style="myStyle" if necessary
-      myStyle : "", // will be initialized at "mounted time" by using the percent variable
-      PLACE_HOLDER : "Ajoutez une ou plusieurs lignes",
-      VOIR_AUSSI : "Voir Aussi...",
+      myStyle: "", // will be initialized at "mounted time" by using the percent variable
+      PLACE_HOLDER: "Ajoutez une ou plusieurs lignes",
+      VOIR_AUSSI: "Voir Aussi...",
       // STRANGE : I want to make it work with stuff like v-model="produits[0]"
       // but declaring produits: Boolean[3] // does not work, I *must* use the following line instead (don't know why)
       produits: [false, false, false],
@@ -252,12 +252,16 @@ export default {
       messClient: "",
       addrTravaux: "",
       descProjet: "",
-      dateProjet: "",      
-      commment : "",      
+      dateProjet: "",
+      commment: "",
       errors: [],
-      textProd1 : "Les cloisons pliantes suspendues Supertherme 80 offrent une multitude de possibilités d'exécution. Pliables vers la gauche, la droite, centrale ou bilatérales, vers l'intérieur ou l'extérieur. Les cloisons pliantes peuvent être réunies dans un angle avec un poteau fixe ou mobile. Largeur de 60 à 1200 mm, Hauteur de 1000 à 2700 mm. Vitrage de 24 à 62mm d'épaisseur. Les cadres ont un coefficient Uf de 1.8, combinés avec les vitrages adéquats ils permettent d'obtenir un coefficient Uw entre 0.8 et 1.4 Watt/m/K. Très facile à utiliser en rénovation.",
-      textProd2 : "Combine fonctionnalité et flexibilité d'une manière unique: ouverture sans limites, même autour des coins, simplement en faisant coulisser la paroi sur le rail fixe au sol. Ce système avec rupture thermique permet de faire coulisser un nombre illimité de parois et de les empiler dans un coin. Ceci peut être combiné avec une porte ouvrante pour les entrées de tous les jours. La possibilité de faire coulisser les parois autour des coins allant jusqu'à 90° permet une grande liberté de design. Principales caractéristiques du système: flexibilité de par l'application d'option de rotation, Système en aluminium avec rupture de pont thermique, Angles de l'élément entre 90° et 180°, Largeur de l'élément: jusqu'à 1300mm, Hauteur de l'élément: jusqu'à 2700mm, Epaisseur du verre: jusqu'à 40mm.",
-      textProd3 : "Porte coulissante suspendue sur un à trois rails, à haut rendement thermique et phonique. Les éléments se soulèvent de 6mm par rotation manuelle de 180° de la poignée à levier. Les joints en caoutchouc sont ainsi libérés et l'élément peut coulisser facilement. Vitrage de 16 à 42mm. Dimensions des vantaux : largeur max = 2500 mm, hauteur max = 2800 mm."
+      myUrl: "",
+      textProd1:
+        "Les cloisons pliantes suspendues Supertherme 80 offrent une multitude de possibilités d'exécution. Pliables vers la gauche, la droite, centrale ou bilatérales, vers l'intérieur ou l'extérieur. Les cloisons pliantes peuvent être réunies dans un angle avec un poteau fixe ou mobile. Largeur de 60 à 1200 mm, Hauteur de 1000 à 2700 mm. Vitrage de 24 à 62mm d'épaisseur. Les cadres ont un coefficient Uf de 1.8, combinés avec les vitrages adéquats ils permettent d'obtenir un coefficient Uw entre 0.8 et 1.4 Watt/m/K. Très facile à utiliser en rénovation.",
+      textProd2:
+        "Combine fonctionnalité et flexibilité d'une manière unique: ouverture sans limites, même autour des coins, simplement en faisant coulisser la paroi sur le rail fixe au sol. Ce système avec rupture thermique permet de faire coulisser un nombre illimité de parois et de les empiler dans un coin. Ceci peut être combiné avec une porte ouvrante pour les entrées de tous les jours. La possibilité de faire coulisser les parois autour des coins allant jusqu'à 90° permet une grande liberté de design. Principales caractéristiques du système: flexibilité de par l'application d'option de rotation, Système en aluminium avec rupture de pont thermique, Angles de l'élément entre 90° et 180°, Largeur de l'élément: jusqu'à 1300mm, Hauteur de l'élément: jusqu'à 2700mm, Epaisseur du verre: jusqu'à 40mm.",
+      textProd3:
+        "Porte coulissante suspendue sur un à trois rails, à haut rendement thermique et phonique. Les éléments se soulèvent de 6mm par rotation manuelle de 180° de la poignée à levier. Les joints en caoutchouc sont ainsi libérés et l'élément peut coulisser facilement. Vitrage de 16 à 42mm. Dimensions des vantaux : largeur max = 2500 mm, hauteur max = 2800 mm.",
     };
   },
 
@@ -268,6 +272,7 @@ export default {
   },
 
   methods: {
+
     postMTTchassis: function () {
       if (!this.checkForm(this.nom, this.mail)) return;
 
@@ -285,11 +290,20 @@ export default {
       };
 
       console.log(dataFromMTT);
+      // SEE :
+      // https://www.jenniferbland.com/how-to-use-environment-variables-in-vue-js/
+
+      //url: "http://127.0.0.1:8090/mttChassis",   // local
+      //url: "http://mtt-backend.sloppy.zone:80/mttChassis", // production
+      // TO DO : factorize VUE_APP_EXECUTION from App.vue
+      var myUrl = "http://127.0.0.1:8090/mttChassis";
+      if (process.env.VUE_APP_EXECUTION == "PRODUCTION") {
+        myUrl = "http://mtt-backend.sloppy.zone:80/mttChassis";
+      }
 
       axios({
         method: "POST",
-        // url: "http://127.0.0.1:8090/mttChassis",   // local
-        url: "http://mtt-backend.sloppy.zone:80/mttChassis", // production
+        url: myUrl,
         data: dataFromMTT,
         headers: { "content-type": "text/plain" },
       })
@@ -337,7 +351,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
 .productText {
   text-align: justify;
   text-justify: auto;
@@ -355,23 +368,22 @@ li {
   margin: 0 10px;
 }
 
-
 a {
   color: #42b983;
 }
 
 hr {
-	border-top: 5px double #8c8b8b;
-  border-style: solid; 
+  border-top: 5px double #8c8b8b;
+  border-style: solid;
 }
 
 .comment {
-  color : transparent;
+  color: transparent;
   background-color: transparent;
   text-emphasis-color: transparent;
   text-decoration-color: transparent;
-  stop-color:transparent;
-  flood-color:transparent;
+  stop-color: transparent;
+  flood-color: transparent;
   color-adjust: transparent;
   lighting-color: transparent;
   caret-color: transparent;
@@ -388,18 +400,17 @@ hr {
   border-inline-start-color: transparent;
   border-block-start-color: transparent;
   border-block-end-color: transparent;
-  border-color: transparent;  
+  border-color: transparent;
   border-top-color: transparent;
   border-left-color: transparent;
   border-right-color: transparent;
   border-bottom-color: transparent;
   border-block-color: transparent;
-  border-inline-color: transparent;  
+  border-inline-color: transparent;
   margin: none;
   padding: none;
   border: none;
-  border-width : 0;
+  border-width: 0;
   outline: none;
-  }
-
+}
 </style>
