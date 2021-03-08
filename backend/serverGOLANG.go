@@ -65,11 +65,11 @@ type responseFromGOserver struct {
 // So keep this work for later...
 
 func checkPassword(pass string) (bool, string) {
-	// Sometimes password string be found with a grep inside the binary
+	// Sometimes password string can be found with a grep inside the binary
 	// So I want to make it more difficult to find...
 	// TO DO : of course change this password before last delivery and do not commit it !
 	// TO DO : decrypt the password here, if it has been encrypted on the vuejs side
-	if pass[0:1]=="L" && pass[1:2]=="a" && pass[2:3]=="u" && pass[3:4]=="r" && pass[4:5]=="e" && pass[5:6]=="n" && pass[6:7]=="t" {
+	if len(pass)==len("Laurent") && pass[0]=='L' && pass[1]=='a' && pass[2]=='u' && pass[3]=='r' && pass[4]=='e' && pass[5]=='n' && pass[6]=='t' {
 		return true, "Mot de passe vérifié"
 	}
 	return false, "Mot de passe incorrect"

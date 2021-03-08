@@ -290,9 +290,7 @@ export default {
       };
 
       console.log(dataFromMTT);
-      // SEE :
-      // https://www.jenniferbland.com/how-to-use-environment-variables-in-vue-js/
-
+      // SEE  https://www.jenniferbland.com/how-to-use-environment-variables-in-vue-js/
       //url: "http://127.0.0.1:8090/mttChassis",   // local
       //url: "http://mtt-backend.sloppy.zone:80/mttChassis", // production
       // TO DO : factorize VUE_APP_EXECUTION from App.vue
