@@ -8,7 +8,7 @@ import (
 //	"database/sql"	
 //	"github.com/mattn/go-sqlite3" // Import go-sqlite3 library	
 //	_ "modernc.org/sqlite"
-//	"log"
+	"log"
 	"os"
 //	"strconv"
 //	"github.com/twinj/uuid"
@@ -171,6 +171,7 @@ func main() {
 	http.HandleFunc("/mttJsonAction", mttJsonAction)
 	http.HandleFunc("/mttChassis", mttChassis)
 	http.HandleFunc("/mttDatabaseAction", mttDatabaseAction)
+	log.Println("MTT_EXECUTION=", os.Getenv("MTT_EXECUTION"))
 	if os.Getenv("MTT_EXECUTION")=="PRODUCTION" {
 		http.ListenAndServe(":80", nil)		// production
 	} else {
