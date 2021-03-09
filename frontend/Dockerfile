@@ -5,7 +5,7 @@
 FROM node:lts-alpine
 
 # installe un simple serveur http pour servir un contenu statique
-RUN npm install http-server
+RUN npm install http-server -g
 
 # définit le dossier 'app' comme dossier de travail
 WORKDIR /app
