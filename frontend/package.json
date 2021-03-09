@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "chokidar": "^3.5.1",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
     "vue-responsive-video-background-player": "^2.1.2",
