@@ -25,4 +25,5 @@ cd ..
 sloppy start --var=domain:mtt-habitat.sloppy.zone mtt-sloppy.json
 sloppy show mtt-habitat
 
+set +x
 echo "sloppy show mtt-habitat"
