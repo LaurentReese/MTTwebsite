@@ -299,6 +299,10 @@ export default {
         myUrl = "http://mtt-backend.sloppy.zone:80/mttChassis";
       }
 
+      console.log("=================")
+      console.log(myUrl)
+      console.log("=================")      
+
       axios({
         method: "POST",
         url: myUrl,

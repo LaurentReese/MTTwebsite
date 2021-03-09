@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-//	"fmt"
+	"fmt"
 	"net/http"
 //	"net/smtp"
 //	"database/sql"	
@@ -172,6 +172,7 @@ func main() {
 	http.HandleFunc("/mttChassis", mttChassis)
 	http.HandleFunc("/mttDatabaseAction", mttDatabaseAction)
 	log.Println("MTT_EXECUTION=", os.Getenv("MTT_EXECUTION"))
+	fmt.Println("MTT_EXECUTION=", os.Getenv("MTT_EXECUTION"))	
 	if os.Getenv("MTT_EXECUTION")=="PRODUCTION" {
 		http.ListenAndServe(":80", nil)		// production
 	} else {
