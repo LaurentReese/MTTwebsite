@@ -296,7 +296,6 @@ export default {
       // TO DO : factorize VUE_APP_EXECUTION from App.vue
       var myUrl = "http://127.0.0.1:8090/mttChassis";
       if (process.env.VUE_APP_EXECUTION == "PRODUCTION") {
-//        myUrl = "http://mtt-backend.sloppy.zone:80/mttChassis";
           myUrl = "https://mtt-backend.sloppy.zone:443/mttChassis"; // 443 will be redirected to 80 on the other side
       }
 
