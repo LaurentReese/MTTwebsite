@@ -12,7 +12,7 @@
             "domain": {
               "uri": "mtt-habitat.sloppy.zone"
             },
-            "ssl": false,
+            "ssl": true,
             "port_mappings": [
               {
                 "container_port": 8080
