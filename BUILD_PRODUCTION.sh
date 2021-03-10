@@ -14,12 +14,16 @@ docker images
 
 cd frontend
 cat .env.production.local
+
 docker build . -t 32681733/mtt-frontend
 docker push 32681733/mtt-frontend
 
 cd ../backend
+./before_compile_backend.sh
 docker build . -t 32681733/mtt-backend
+./after_compile_backend.sh
 docker push 32681733/mtt-backend
+
 
 cd ..
 sloppy start --var=domain:mtt-habitat.sloppy.zone mtt-sloppy.json

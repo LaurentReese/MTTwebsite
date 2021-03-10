@@ -69,10 +69,17 @@ func checkPassword(pass string) (bool, string) {
 	// So I want to make it more difficult to find...
 	// TO DO : of course change this password before last delivery and do not commit it !
 	// TO DO : decrypt the password here, if it has been encrypted on the vuejs side
-	if len(pass)==len("Laurent") && pass[0]=='L' && pass[1]=='a' && pass[2]=='u' && pass[3]=='r' && pass[4]=='e' && pass[5]=='n' && pass[6]=='t' {
+
+	dynamicPassword := "MTT_DYNAMIC_PASSWORD"
+	if pass != dynamicPassword {
+		return false, "Mot de passe incorrect"
+	}
+	return true, "Mot de passe vérifié"
+
+/*	if len(pass)==len("MTT_DYNAMIC_PASSWORD") && pass[0]=='L' && pass[1]=='a' && pass[2]=='u' && pass[3]=='r' && pass[4]=='e' && pass[5]=='n' && pass[6]=='t' {
 		return true, "Mot de passe vérifié"
 	}
-	return false, "Mot de passe incorrect"
+	return false, "Mot de passe incorrect" */
 }
 
 func mttChassis(w http.ResponseWriter, request *http.Request) {
