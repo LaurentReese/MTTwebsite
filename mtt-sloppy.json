@@ -48,7 +48,7 @@
             },
             "volumes": [
               {
-                "container_path": "/data/db",
+                "container_path": "/app",
                 "size": "8GB"
               }
             ],
