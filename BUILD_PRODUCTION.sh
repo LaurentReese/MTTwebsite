@@ -3,8 +3,6 @@
 
 # TO DO : verify that we are in the MTTwebsite directory
 set -x # verbose mode in order to follow what is happening
-sloppy delete mtt-habitat
-sloppy show
 
 docker rmi 32681733/mtt-frontend --force
 docker rmi 32681733/mtt-backend --force
@@ -24,8 +22,9 @@ docker build . -t 32681733/mtt-backend
 ./after_compile_backend.sh
 docker push 32681733/mtt-backend
 
-
 cd ..
+sloppy delete mtt-habitat
+sloppy show
 sloppy start --var=domain:mtt-habitat.sloppy.zone mtt-sloppy.json
 sloppy show mtt-habitat
 
