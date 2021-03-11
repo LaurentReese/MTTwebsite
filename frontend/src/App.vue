@@ -14,7 +14,12 @@
 import MTTChassis from "./components/MTTChassis.vue";
 import MTTAdmin from "./components/MTTAdmin.vue";
 
+
 export default {
+  mounted() {
+  this.$forceUpdate();
+  },
+
   name: "App",
   components: {
     MTTChassis,
@@ -33,7 +38,7 @@ export default {
 
 <style>
 #app {
-  background-color: #999999;
+  background-color: #c9c9c9;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
