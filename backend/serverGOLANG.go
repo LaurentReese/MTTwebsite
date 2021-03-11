@@ -4,22 +4,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-//	"net/smtp"
-//	"database/sql"	
-//	"github.com/mattn/go-sqlite3" // Import go-sqlite3 library	
-//	_ "modernc.org/sqlite"
+
+	//	"net/smtp"
+	//	"database/sql"
+	//	"github.com/mattn/go-sqlite3" // Import go-sqlite3 library
+	//	_ "modernc.org/sqlite"
 	"log"
 	"os"
-//	"strconv"
-//	"github.com/twinj/uuid"
-//	"io/ioutil"	
+	//	"strconv"
+	//	"github.com/twinj/uuid"
+	//	"io/ioutil"
 )
 
-const MTT_DATABASE string ="MTT-sqlite-database.db"
+const MTT_DATABASE string = "MTT-sqlite-database.db"
 const MTT_ACKNOWLEDGE string = "L'entreprise MTT a été informée, merci de votre intérêt"
 const MTT_NO_ROWS_IN_RESULT_SET string = "sql: no rows in result set"
 const MTT_JSON_NAME string = "MTTchassis.json"
-	
+
 /* TO DO : improve error handling later on with this kind of treatment
 // To put inside a function
 if err := dec.Decode(&val); err != nil {
@@ -31,18 +32,17 @@ if err := dec.Decode(&val); err != nil {
 }*/
 
 type receivedFromMTTchassis struct {
-	Nom string `json:"nom"`
-	Prenom string `json:"prenom"`
-	Telephone string `json:"telephone"`
-	Mail string `json:"mail"`
-	Produits [] bool `json:"produits"` // a slice instead of an array !
-	AddrTravaux string `json:"addrTravaux"`		
-	MessClient string `json:"messClient"`
-	DescProjet string `json:"descProjet"`		
-	DateProjet string `json:"dateProjet"`
-	Comment string `json:"comment"`
+	Nom         string `json:"nom"`
+	Prenom      string `json:"prenom"`
+	Telephone   string `json:"telephone"`
+	Mail        string `json:"mail"`
+	Produits    []bool `json:"produits"` // a slice instead of an array !
+	AddrTravaux string `json:"addrTravaux"`
+	MessClient  string `json:"messClient"`
+	DescProjet  string `json:"descProjet"`
+	DateProjet  string `json:"dateProjet"`
+	Comment     string `json:"comment"`
 }
-
 
 type receivedFromMTTchassisPassword struct {
 	Password string `json:"password"`
@@ -50,7 +50,7 @@ type receivedFromMTTchassisPassword struct {
 
 type receivedFromMTTJson struct {
 	Password string `json:"password"`
-	Text string `json:"text"`
+	Text     string `json:"text"`
 }
 
 // data coming from my vuejs client
@@ -65,30 +65,22 @@ type responseFromGOserver struct {
 // So keep this work for later...
 
 func checkPassword(pass string) (bool, string) {
-	// Sometimes password string can be found with a grep inside the binary
-	// So I want to make it more difficult to find...
-	// TO DO : of course change this password before last delivery and do not commit it !
-	// TO DO : decrypt the password here, if it has been encrypted on the vuejs side
-
 	dynamicPassword := "MTT_DYNAMIC_PASSWORD"
 	if pass != dynamicPassword {
 		return false, "Mot de passe incorrect"
 	}
 	return true, "Mot de passe vérifié"
-
-/*	if len(pass)==len("MTT_DYNAMIC_PASSWORD") && pass[0]=='L' && pass[1]=='a' && pass[2]=='u' && pass[3]=='r' && pass[4]=='e' && pass[5]=='n' && pass[6]=='t' {
-		return true, "Mot de passe vérifié"
-	}
-	return false, "Mot de passe incorrect" */
 }
 
 func mttChassis(w http.ResponseWriter, request *http.Request) {
 	decoder := json.NewDecoder(request.Body) // create json decoder ...
 	var mttData receivedFromMTTchassis
 	var reponseData responseFromGOserver
-	
+
 	decoder.Decode(&mttData) // ... and receive data from the vuejs client
-	if mttData.Comment != "" { return }
+	if mttData.Comment != "" {
+		return
+	}
 	//fmt.Println(mttData)  KEEP it for debugging purpose
 
 	go sendMail(&mttData) // this struct may become bigger, so better to pass it by address.
@@ -100,22 +92,24 @@ func mttChassis(w http.ResponseWriter, request *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusOK)
 
-    if err := json.NewEncoder(w).Encode(reponseData); err != nil { panic(err) }
+	if err := json.NewEncoder(w).Encode(reponseData); err != nil {
+		panic(err)
+	}
 }
 
 func mttDatabaseAction(w http.ResponseWriter, request *http.Request) {
 	decoder := json.NewDecoder(request.Body) // create json decoder ...
 	var mttDataPassword receivedFromMTTchassisPassword
 	var reponseData responseFromGOserver
-	
+
 	decoder.Decode(&mttDataPassword) // ... and receive data from the vuejs client
 	//fmt.Println(mttDataPassword.Password) // KEEP it for debugging purpose
 
 	var verif bool
 	verif, reponseData.MessageServer = checkPassword(mttDataPassword.Password)
-	if (verif) {
+	if verif {
 		if !nodeExists(MTT_DATABASE) {
 			// password is ok, but the database is not available
 			reponseData.MessageServer = MTT_DATABASE + " n'existe pas sur le serveur !"
@@ -129,22 +123,24 @@ func mttDatabaseAction(w http.ResponseWriter, request *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusOK)
 
-    if err := json.NewEncoder(w).Encode(reponseData); err != nil { panic(err) }
+	if err := json.NewEncoder(w).Encode(reponseData); err != nil {
+		panic(err)
+	}
 }
 
 func mttJsonAction(w http.ResponseWriter, request *http.Request) {
 	decoder := json.NewDecoder(request.Body) // create json decoder ...
 	var mttDataJson receivedFromMTTJson
-	var	reponseData responseFromGOserver
+	var reponseData responseFromGOserver
 
 	decoder.Decode(&mttDataJson) // ... and receive data from the vuejs client
 
 	var verif bool
 	verif, reponseData.MessageServer = checkPassword(mttDataJson.Password)
-	if (verif) {
-		jsonByteArray := [] byte(mttDataJson.Text)
+	if verif {
+		jsonByteArray := []byte(mttDataJson.Text)
 		jsonOK := json.Valid(jsonByteArray)
 		if !jsonOK {
 			reponseData.MessageServer = "Erreur dans le fichier json transmis"
@@ -152,38 +148,43 @@ func mttJsonAction(w http.ResponseWriter, request *http.Request) {
 			if createProductsTableFromJsonContent(jsonByteArray) {
 				reponseData.MessageServer = "Succès : produits intégrés dans la base de données"
 			} else {
-				reponseData.MessageServer = "Erreur de syntaxe dans le fichier json transmis"			
+				reponseData.MessageServer = "Erreur de syntaxe dans le fichier json transmis"
 			}
 		}
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusOK)
 
-    if err := json.NewEncoder(w).Encode(reponseData); err != nil { panic(err) }
+	if err := json.NewEncoder(w).Encode(reponseData); err != nil {
+		panic(err)
+	}
 }
 
 func nodeExists(node string) bool { // to me a node is a folder or a filepath
-	_ , err := os.Stat(node)
-	if err != nil { return false }
-	if os.IsNotExist(err) {return false}
-	return true;
+	_, err := os.Stat(node)
+	if err != nil {
+		return false
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
 }
 
-
 func main() {
-//	createProductsTableFromJson(MTT_JSON_NAME)
-//	return
+	//	createProductsTableFromJson(MTT_JSON_NAME)
+	//	return
 	http.HandleFunc("/mttJsonAction", mttJsonAction)
 	http.HandleFunc("/mttChassis", mttChassis)
 	http.HandleFunc("/mttDatabaseAction", mttDatabaseAction)
 	log.Println("MTT_EXECUTION=", os.Getenv("MTT_EXECUTION"))
-	fmt.Println("MTT_EXECUTION=", os.Getenv("MTT_EXECUTION"))	
-	if os.Getenv("MTT_EXECUTION")=="PRODUCTION" {
-		http.ListenAndServe(":80", nil)		// production
+	fmt.Println("MTT_EXECUTION=", os.Getenv("MTT_EXECUTION"))
+	if os.Getenv("MTT_EXECUTION") == "PRODUCTION" {
+		http.ListenAndServe(":80", nil) // production
 	} else {
-		http.ListenAndServe(":8090", nil)	// local
+		http.ListenAndServe(":8090", nil) // local
 	}
 
 }
