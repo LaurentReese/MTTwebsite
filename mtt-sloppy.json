@@ -12,7 +12,7 @@
             "domain": {
               "uri": "mtt-habitat.sloppy.zone"
             },
-            "ssl": false,
+            "ssl": true,
             "port_mappings": [
               {
                 "container_port": 8080
@@ -48,7 +48,7 @@
             },
             "volumes": [
               {
-                "container_path": "/data/db",
+                "container_path": "/app",
                 "size": "8GB"
               }
             ],

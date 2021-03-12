@@ -1,40 +1,50 @@
 <template>
   <div id="app">
-    <img alt="MTT logo" src="./assets/LOGO MTT HABITAT.png" img width="20%">
+    <img alt="MTT logo" src="./assets/LOGO MTT HABITAT.png" img width="20%" />
     <MTTAdmin />
-    <MTTChassis v-bind:msg1=MSG1 v-bind:msg2=MSG2 v-bind:interet=INTERET />
+    <MTTChassis
+      v-bind:msg1="MSG1"
+      v-bind:msg2="MSG2"
+      v-bind:interet="INTERET"
+    />
   </div>
 </template>
 
 <script>
-import MTTChassis from './components/MTTChassis.vue'
-import MTTAdmin from './components/MTTAdmin.vue'
+import MTTChassis from "./components/MTTChassis.vue";
+import MTTAdmin from "./components/MTTAdmin.vue";
+
 
 export default {
-  name: 'App',
+  mounted() {
+  this.$forceUpdate();
+  },
+
+  name: "App",
   components: {
     MTTChassis,
-    MTTAdmin
+    MTTAdmin,
   },
-  data : function() {
+  data: function () {
     return {
-      MSG1 : "Bienvenue sur le site de MTT HABITAT",
-      MSG2 : "Nous présentons des solutions spéciales de système à ouverture totale. De conception suédoise, ces produits sont de haute qualité et offrent de grandes performances d'isolations thermique et phonique.",
-      INTERET : "Je suis intéressé par ce produit"
-    }
+      MSG1: "Bienvenue sur le site de MTT HABITAT",
+      MSG2:
+        "Nous présentons des solutions spéciales de système à ouverture totale. De conception suédoise, ces produits sont de haute qualité et offrent de grandes performances d'isolations thermique et phonique.",
+      INTERET: "Je suis intéressé par ce produit",
+    };
   },
-
-}
+};
 </script>
 
+//  background-color: #c9c9c9; is the color taken from MTT logo
 <style>
 #app {
-  background-color: #e4e4e4;
+  background-color: #9c9c9c;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: left;
-  vertical-align: middle;  
+  vertical-align: middle;
   color: #2c3e50;
   margin-top: 60px;
 }

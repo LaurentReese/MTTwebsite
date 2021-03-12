@@ -22,7 +22,7 @@ RUN go get modernc.org/sqlite
 
 ## we run go build to compile the binary
 ## executable of our Go program
-RUN go build serverGOLANG.go sendmailGOLANG.go databaseGOLANG.go 
+RUN go build serverGOLANG.go sendmailGOLANG.go databaseGOLANG.go cryptGOLANG.go
 
 # EXPOSE 80 is necessary for production, but does nothing in local
 EXPOSE 80
@@ -32,6 +32,7 @@ EXPOSE 80
 CMD ["/app/serverGOLANG"]
 
 # from the directory where Dockerfile is, run the command :
+# ==> 
 # ==> docker build . -t mtt-backend
 # see the results :
 # ==> docker images
@@ -48,5 +49,3 @@ CMD ["/app/serverGOLANG"]
 # ==> docker run -it -p 8090:8090 -m 1536m --memory-swap=1536m 32681733/mtt-backend
 # To push the image to Docker Hub (32681733 is my Docker Hub ID)
 # ==> docker push 32681733/mtt-backend
-
-

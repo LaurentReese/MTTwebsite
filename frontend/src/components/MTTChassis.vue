@@ -14,7 +14,7 @@
     <pre></pre>       
     <img
       alt="FENETRES PLIANTES PISCINE"
-      src="../assets/FENETRES PLIANTES PISCINE.jpg"
+      src="../assets/187_Product_Image_thermoslide-77.jpg"
       img
       :width="percent"
     />
@@ -39,7 +39,7 @@
       :autoHeight="autoHeight"
     ></textarea>
     <pre></pre>
-    <a href="https://www.archiexpo.fr/prod/sunparadise/product-94948-1252311.html">{{VOIR_AUSSI}}</a>    
+    <a href="https://www.archiexpo.fr/prod/sunparadise/product-94948-1252311.html">{{VOIR_AUSSI}}</a>
     <pre></pre>    
     <input type="checkbox" v-model="produits[0]" />
     {{interet}}
@@ -56,7 +56,7 @@
     <pre></pre>
     <img
       alt="FENETRES PLIANTES 5VTX"
-      src="../assets/FENETRES PLIANTES 5VTX.jpg"
+      src="../assets/186_Product_Image_thermofold-86.jpg"
       img
       :width="percent"
     />
@@ -272,7 +272,6 @@ export default {
   },
 
   methods: {
-
     postMTTchassis: function () {
       if (!this.checkForm(this.nom, this.mail)) return;
 
@@ -286,7 +285,7 @@ export default {
         messClient: this.messClient,
         descProjet: this.descProjet,
         dateProjet: this.dateProjet,
-        comment: this.comment
+        comment: this.comment,
       };
 
       console.log(dataFromMTT);
@@ -296,8 +295,12 @@ export default {
       // TO DO : factorize VUE_APP_EXECUTION from App.vue
       var myUrl = "http://127.0.0.1:8090/mttChassis";
       if (process.env.VUE_APP_EXECUTION == "PRODUCTION") {
-        myUrl = "http://mtt-backend.sloppy.zone:80/mttChassis";
+        myUrl = "https://mtt-backend.sloppy.zone:443/mttChassis"; // 443 will be redirected to 80 on the other side
       }
+
+      console.log("=================");
+      console.log(myUrl);
+      console.log("=================");
 
       axios({
         method: "POST",
@@ -352,6 +355,8 @@ export default {
 .productText {
   text-align: justify;
   text-justify: auto;
+  background-color: #9c9c9c;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
 }
 
 h3 {
@@ -367,7 +372,7 @@ li {
 }
 
 a {
-  color: #42b983;
+  color: rgb(28, 124, 148);
 }
 
 hr {

@@ -14,8 +14,8 @@
       <hr />
       <pre></pre>
       <input type="file" ref="myFile" @change="selectedFile" />
-      <br/>            
-      <br/>                  
+      <br />
+      <br />
       <button v-on:click="MTTJsonAction">Mettre à jour les produits</button>
       <br /><br />
       <hr />
@@ -50,14 +50,14 @@ export default {
     selectedFile() {
       // see: https://www.raymondcamden.com/2019/05/21/reading-client-side-files-for-validation-with-vuejs
       let file = this.$refs.myFile.files[0];
-      if (!file) /* || file.type !== "text/plain") */ {
-        this.text = ""
+      if (!file) {
+        /* || file.type !== "text/plain") */ this.text = "";
         return;
       }
       let reader = new FileReader();
       reader.readAsText(file, "UTF-8");
       reader.onload = (evt) => {
-      this.text = evt.target.result;
+        this.text = evt.target.result;
       };
       reader.onerror = (evt) => {
         console.error(evt);
@@ -67,7 +67,7 @@ export default {
     MTTAdmin: function () {
       this.password = "";
       this.askPassword = !this.askPassword; // toggle state
-      this.text = ""
+      this.text = "";
     },
 
     MTTDatabaseAction: function () {
@@ -82,7 +82,7 @@ export default {
       // TO DO : factorize VUE_APP_EXECUTION from App.vue
       var myUrl = "http://127.0.0.1:8090/mttDatabaseAction";
       if (process.env.VUE_APP_EXECUTION == "PRODUCTION") {
-        myUrl = "http://mtt-backend.sloppy.zone:80/mttDatabaseAction";
+        myUrl = "https://mtt-backend.sloppy.zone:443/mttDatabaseAction"; // 443 will be redirected to 80 on the other side
       }
 
       axios({
@@ -108,7 +108,7 @@ export default {
         alert("Le mot de passe est vide");
         return;
       }
-      if (this.text=="") {
+      if (this.text == "") {
         alert("Pas de fichier json sélectionné");
         return;
       }
@@ -116,9 +116,10 @@ export default {
         password: this.password,
         text: this.text,
       };
+      // TO DO : factorize VUE_APP_EXECUTION from App.vue
       var myUrl = "http://127.0.0.1:8090/mttJsonAction"; // local
       if (process.env.VUE_APP_EXECUTION == "PRODUCTION") {
-        myUrl = "http://mtt-backend.sloppy.zone:80/mttJsonAction";
+        myUrl = "https://mtt-backend.sloppy.zone:443/mttJsonAction"; // 443 will be redirected to 80 on the other side
       }
 
       axios({
@@ -136,8 +137,8 @@ export default {
           console.error(error);
           alert("Serveur MTT indisponible");
         });
-    }
-  }
+    },
+  },
 };
 </script>
 
