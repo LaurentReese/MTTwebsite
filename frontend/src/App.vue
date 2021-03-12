@@ -36,9 +36,10 @@ export default {
 };
 </script>
 
+//  background-color: #c9c9c9; is the color taken from MTT logo
 <style>
 #app {
-  background-color: #c9c9c9;
+  background-color: #9c9c9c;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

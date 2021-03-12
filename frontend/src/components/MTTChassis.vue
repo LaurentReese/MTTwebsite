@@ -56,7 +56,7 @@
     <pre></pre>
     <img
       alt="FENETRES PLIANTES 5VTX"
-      src="../assets/FENETRES PLIANTES 5VTX.jpg"
+      src="../assets/186_Product_Image_thermofold-86.jpg"
       img
       :width="percent"
     />
@@ -355,6 +355,8 @@ export default {
 .productText {
   text-align: justify;
   text-justify: auto;
+  background-color: #9c9c9c;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
 }
 
 h3 {
