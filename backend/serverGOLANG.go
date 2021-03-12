@@ -64,14 +64,6 @@ type responseFromGOserver struct {
 // But today I don't know which one I will keep, which one I will withdraw, etc
 // So keep this work for later...
 
-func checkPassword(pass string) (bool, string) {
-	dynamicPassword := "MTT_DYNAMIC_PASSWORD"
-	if pass != dynamicPassword {
-		return false, "Mot de passe incorrect"
-	}
-	return true, "Mot de passe vérifié"
-}
-
 func mttChassis(w http.ResponseWriter, request *http.Request) {
 	decoder := json.NewDecoder(request.Body) // create json decoder ...
 	var mttData receivedFromMTTchassis
@@ -176,6 +168,8 @@ func nodeExists(node string) bool { // to me a node is a folder or a filepath
 func main() {
 	//	createProductsTableFromJson(MTT_JSON_NAME)
 	//	return
+	// encrypt(data []byte, "ThisIsMy") []byte
+	// decrypt(data []byte, passphrase string) []byte
 	http.HandleFunc("/mttJsonAction", mttJsonAction)
 	http.HandleFunc("/mttChassis", mttChassis)
 	http.HandleFunc("/mttDatabaseAction", mttDatabaseAction)
