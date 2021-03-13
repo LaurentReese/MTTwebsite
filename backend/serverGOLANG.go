@@ -182,3 +182,10 @@ func main() {
 	}
 
 }
+
+func checkPassword(pass string) (bool, string) {
+	if pass != "MTT_DYNAMIC_PASSWORD" {
+		return false, "Mot de passe incorrect"
+	}
+	return true, "Mot de passe vérifié"
+}

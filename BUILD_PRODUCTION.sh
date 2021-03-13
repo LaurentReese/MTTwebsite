@@ -17,7 +17,9 @@ docker build . -t 32681733/mtt-frontend
 docker push 32681733/mtt-frontend
 
 cd ../backend
+./before_compile_backend
 docker build . -t 32681733/mtt-backend
+./after_compile_backend
 docker push 32681733/mtt-backend
 
 cd ..

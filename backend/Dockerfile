@@ -33,7 +33,7 @@ CMD ["/app/serverGOLANG"]
 
 # from the directory where Dockerfile is, run the command :
 # ==> 
-# ==> docker build . -t mtt-backend
+# ==> ./before_compile_backend.sh; docker build . -t mtt-backend; ./after_compile_backend.sh
 # see the results :
 # ==> docker images
 # run it 
@@ -44,7 +44,7 @@ CMD ["/app/serverGOLANG"]
 # ==> docker images purge
 #
 # To build a distant image (will go to Docker Hub, 32681733 is my Docker Hub ID)
-# ==> docker build . -t 32681733/mtt-backend
+# ==> ./before_compile_backend.sh; docker build . -t 32681733/mtt-backend; ./after_compile_backend.sh
 # To test locally the distant Docker image
 # ==> docker run -it -p 8090:8090 -m 1536m --memory-swap=1536m 32681733/mtt-backend
 # To push the image to Docker Hub (32681733 is my Docker Hub ID)
