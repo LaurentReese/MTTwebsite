@@ -22,7 +22,7 @@ RUN go get modernc.org/sqlite
 
 ## we run go build to compile the binary
 ## executable of our Go program
-RUN go build serverGOLANG.go sendmailGOLANG.go databaseGOLANG.go cryptGOLANG.go
+RUN go build serverGOLANG.go sendmailGOLANG.go databaseGOLANG.go
 
 # EXPOSE 80 is necessary for production, but does nothing in local
 EXPOSE 80
