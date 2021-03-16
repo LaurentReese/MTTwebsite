@@ -1,7 +1,8 @@
 <template>
   <div class="MTTChassis">
-    <h1>{{ msg1 }}</h1>
-    <h1>{{ msg2 }}</h1>
+      <h1>{{ msg1 }}</h1>
+      <h1>{{ msg2 }}</h1>
+
 
     <hr />
     <b>
@@ -14,7 +15,7 @@
     <pre></pre>       
     <img
       alt="FENETRES PLIANTES PISCINE"
-      src="../assets/187_Product_Image_thermoslide-77.jpg"
+      src="../assets/111_Product_Image_monoslide-80.jpg"
       img
       :width="percent"
     />
@@ -23,7 +24,7 @@
       muted  = "true"
       autoplay = "true"    
       loop = "true"
-      src = "../assets/Fenetres Empilables Mediterranee Techniques Travaux.webm"    
+      src = "../assets/sunparadise-monoslide-80.mp4"    
       ref="videoFenetresEmpilables"
       :width="percent"
       horizontal-align=left
@@ -49,8 +50,9 @@
     <b>
     Supertherme 80 : Chassis à vantaux pliants empilables en accordéon
     </b>
-    <pre></pre>              
-    Prix : 700 Euros/m2
+    <pre></pre>   
+    <!-- 700 Euros/m2-->         
+    Prix :  sur devis
     <pre></pre>              
     Délai de livraison : 6 à 8 semaines
     <pre></pre>
@@ -98,17 +100,18 @@
     Bali 60/ThermoSlide 77 : Panneau coulissant suspendu
     </b>
     <pre></pre>      
-    Prix : 700 Euros/m2
+    <!-- 700 Euros/m2-->         
+    Prix :  sur devis
     <pre></pre>          
     Délai de livraison : 6 à 8 semaines
     <pre></pre>       
     <img
       alt="11_Image_bali-60"
-      src="../assets/11_Image_bali-60.jpg"
+      src="../assets/187_Product_Image_thermoslide-77.jpg"
       img
       :width="percent"
     />
-    <pre></pre>    
+    <pre></pre>
     <video
       muted  = "true"
       autoplay = "true"    
